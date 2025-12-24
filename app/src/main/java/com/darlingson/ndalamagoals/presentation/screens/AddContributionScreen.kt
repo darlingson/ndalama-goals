@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -15,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,7 +34,7 @@ fun AddContributionScreen(
     onBack: () -> Unit,
     onSave: () -> Unit
 ) {
-    var amount by remember { mutableStateOf(0) }
+    var amount by remember { mutableStateOf("0") }
     var selectedCategory by remember { mutableStateOf("Savings") }
     var description by remember { mutableStateOf("") }
     var additionalNotes by remember { mutableStateOf("") }
@@ -77,28 +81,24 @@ fun AddContributionScreen(
             item {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                     Text("$", fontSize = 48.sp, color = AccentGreen, fontWeight = FontWeight.Light)
-                    Text(
-                        "$${amount}",
-                        fontSize = 64.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Text("USD", color = Color.Gray, fontSize = 18.sp)
-
-                    Spacer(Modifier.height(16.dp))
-
-                    // Simple slider (replace with better one or custom if needed)
-                    Slider(
-                        value = amount.toFloat(),
-                        onValueChange = { amount = it.toInt() },
-                        valueRange = 0f..5000f,
-                        steps = 99,
-                        colors = SliderDefaults.colors(
-                            thumbColor = AccentGreen,
-                            activeTrackColor = AccentGreen
+                    BasicTextField(
+                        value = amount,
+                        onValueChange = { newValue ->
+                            // Allow only digits
+                            if (newValue.all { it.isDigit() }) {
+                                amount = newValue
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        textStyle = LocalTextStyle.current.copy(
+                            fontSize = 64.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
+                    Text("USD", color = Color.Gray, fontSize = 18.sp)
                 }
             }
 

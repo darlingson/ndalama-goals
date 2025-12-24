@@ -47,7 +47,8 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("create_goal") { CreateGoalScreen(navController, mainViewModel) }
                     composable("edit_goal") { CreateGoalScreen(navController, mainViewModel) }
-                    composable("add_contribution") {
+                    composable("add_contribution/{goalId}") { backStackEntry ->
+                        val goalId = backStackEntry.arguments?.getString("goalId")?.toIntOrNull()
                         AddContributionScreen(
                             onBack = {
                                 navController.popBackStack()
@@ -55,7 +56,8 @@ class MainActivity : ComponentActivity() {
                             onSave = {
                                 navController.popBackStack()
                             },
-                            mainViewModel
+                            mainViewModel,
+                            goalId
                         )
                     }
                 }

@@ -89,7 +89,7 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = {navController.navigate("add_contribution")},
+                onClick = {navController.navigate("add_contribution/${goal.id}")},
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },

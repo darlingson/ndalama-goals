@@ -18,6 +18,7 @@ class appViewModel(private val contributionRepository: ContributionRepository, p
     val allGoals: StateFlow<List<Goal>> = goalRepository.allGoals
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+
     fun addContribution(amount: Double, type: String, desc: String, date: Long, goalId: Int, source: String) {
         viewModelScope.launch {
             val newContribution = Contribution(

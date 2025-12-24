@@ -41,7 +41,10 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(navController = navController, startDestination = "goals_list") {
                     composable("goals_list") { GoalsListScreen(navController, mainViewModel) }
-                    composable("goal_detail") { GoalDetailScreen(navController, mainViewModel) }
+                    composable("goal_detail/{goalId}") { backStackEntry ->
+                        val goalId = backStackEntry.arguments?.getString("goalId")?.toIntOrNull()
+                        GoalDetailScreen(navController, mainViewModel, goalId)
+                    }
                     composable("create_goal") { CreateGoalScreen(navController, mainViewModel) }
                     composable("edit_goal") { CreateGoalScreen(navController, mainViewModel) }
                     composable("add_contribution") {

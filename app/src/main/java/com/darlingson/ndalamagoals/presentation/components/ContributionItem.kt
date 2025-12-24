@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,20 +25,20 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun ContributionItem(amount: String, type: String, desc: String, date: String) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 8.dp)) {
-        Box(modifier = Modifier.size(40.dp).background(Color(0xFF1E3A35), CircleShape), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.size(40.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape), contentAlignment = Alignment.Center) {
             when {
-                amount.startsWith("+") -> Icon(Icons.Default.Add, contentDescription = null, tint = Color(0xFF00C4B4))
-                amount.startsWith("-") -> Icon(Icons.Default.Add, contentDescription = null, tint = Color.Red) // Placeholder
-                else -> Icon(Icons.Default.Add, contentDescription = null, tint = Color.Gray)
+                amount.startsWith("+") -> Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                amount.startsWith("-") -> Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.error) // Placeholder
+                else -> Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         Spacer(Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(type, color = Color.White, fontWeight = FontWeight.Bold)
-            Text(desc, color = Color.Gray)
-            Text(date, color = Color.Gray, fontSize = 12.sp)
+            Text(type, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+            Text(desc, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(date, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
         }
-        Text(amount, color = if (amount.startsWith("+")) Color(0xFF00C4B4) else Color.Red, fontWeight = FontWeight.Bold)
+        Text(amount, color = if (amount.startsWith("+")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
     }
 }
 

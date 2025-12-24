@@ -27,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -35,7 +36,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,58 +54,62 @@ fun GoalsListScreen(navController: NavHostController) {
                         Icon(Icons.Default.Lock, contentDescription = "Private")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0D1F1C))
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { navController.navigate("create_goal") },
-                containerColor = Color(0xFF00C4B4),
-                contentColor = Color.Black,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
                 text = { Text("Add New Goal") }
             )
         }
     ) { padding ->
-        Column(modifier = Modifier.padding(padding).fillMaxSize().background(Color(0xFF0A1A17))) {
+        Column(modifier = Modifier.padding(padding).fillMaxSize().background(MaterialTheme.colorScheme.background)) {
             Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A35)), modifier = Modifier.weight(1f)) {
+                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.weight(1f)) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
-                        Text("TOTAL SAVED", color = Color.Gray, fontSize = 12.sp)
-                        Text("$14,500", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                        Text("TOTAL SAVED", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                        Text("$14,500", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
                 Spacer(Modifier.width(16.dp))
-                Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A35)), modifier = Modifier.weight(1f)) {
+                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.weight(1f)) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
-                        Text("GOAL TARGET", color = Color.Gray, fontSize = 12.sp)
-                        Text("$32,000", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                        Text("GOAL TARGET", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                        Text("$32,000", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             }
 
-            Text("Priority Goal", color = Color.White, modifier = Modifier.padding(16.dp))
-            Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A35)), modifier = Modifier.padding(horizontal = 16.dp)) {
+            Text("Priority Goal", color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(16.dp))
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.padding(horizontal = 16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp)) {
                     Box(
-                        modifier = Modifier.size(100.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFF0D2A25)),
+                        modifier = Modifier.size(100.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)),
                         contentAlignment = Alignment.Center
                     ) {
                         // Placeholder for cylinder progress (simplified with LinearProgress)
                         CircularProgressIndicator(
                             progress = 0.8f,
-                            color = Color(0xFF00C4B4),
+                            color = MaterialTheme.colorScheme.primary,
                             strokeWidth = 8.dp,
                             modifier = Modifier.size(80.dp)
                         )
-                        Text("80%", color = Color.White)
+                        Text("80%", color = MaterialTheme.colorScheme.onSurface)
                     }
                     Spacer(Modifier.width(16.dp))
                     Column {
-                        Text("Emergency Fund", color = Color.White, fontWeight = FontWeight.Bold)
-                        Text("$8,000 / $10,000", color = Color.Gray)
+                        Text("Emergency Fund", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                        Text("$8,000 / $10,000", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(8.dp))
-                        Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C4B4))) {
+                        Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
                             Text("+")
                         }
                     }
@@ -113,8 +117,8 @@ fun GoalsListScreen(navController: NavHostController) {
             }
 
             Row(modifier = Modifier.padding(16.dp)) {
-                Text("Active Goals", color = Color.White, modifier = Modifier.weight(1f))
-                Text("View All", color = Color(0xFF00C4B4))
+                Text("Active Goals", color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+                Text("View All", color = MaterialTheme.colorScheme.primary)
             }
 
             LazyColumn {
@@ -144,11 +148,11 @@ fun GoalsListScreen(navController: NavHostController) {
                 }
             }
 
-            Card(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+            Card(modifier = Modifier.padding(16.dp).fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                 Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp)) {
-                    Icon(Icons.Default.Add, contentDescription = null, tint = Color(0xFF00C4B4))
+                    Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(Modifier.width(8.dp))
-                    Text("Have a new dream?", color = Color.White)
+                    Text("Have a new dream?", color = MaterialTheme.colorScheme.onSurface)
                 }
             }
         }

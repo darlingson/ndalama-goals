@@ -26,6 +26,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -33,7 +34,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,31 +56,36 @@ fun GoalDetailScreen(navController: NavHostController) {
                     IconButton(onClick = {}) { Icon(Icons.Default.Edit, contentDescription = null) }
                     IconButton(onClick = {}) { Icon(Icons.Default.MoreVert, contentDescription = null) }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0D1F1C))
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {navController.navigate("add_contribution")},
-                containerColor = Color(0xFF00C4B4),
-                contentColor = Color.Black,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
                 text = { Text("Add Contribution") }
             )
         }
     ) { padding ->
-        Column(modifier = Modifier.padding(padding).fillMaxSize().background(Color(0xFF0A1A17))) {
-            Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF1E3A35)), modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(padding).fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.padding(16.dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
-                    Icon(Icons.Default.Share, contentDescription = null, tint = Color(0xFF00C4B4), modifier = Modifier.size(60.dp))
-                    Text("Target Date: Dec 25, 2024", color = Color.Gray)
+                    Icon(Icons.Default.Share, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(60.dp))
+                    Text("Target Date: Dec 25, 2024", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(16.dp))
-                    Text("CURRENT BALANCE", color = Color.Gray)
-                    Text("$1,200 / $6,000", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-                    Text("20% Achieved", color = Color(0xFF00C4B4))
-                    Text("$4,800 left", color = Color.Gray)
-                    LinearProgressIndicator(progress = 0.2f, color = Color(0xFF00C4B4), modifier = Modifier.fillMaxWidth())
-                    Text("On track to reach goal by deadline.", color = Color.Green)
+                    Text("CURRENT BALANCE", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("$1,200 / $6,000", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    Text("20% Achieved", color = MaterialTheme.colorScheme.primary)
+                    Text("$4,800 left", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    LinearProgressIndicator(progress = 0.2f, color = MaterialTheme.colorScheme.primary, modifier = Modifier.fillMaxWidth())
+                    Text("On track to reach goal by deadline.", color = MaterialTheme.colorScheme.primary)
                 }
             }
 
@@ -93,8 +98,8 @@ fun GoalDetailScreen(navController: NavHostController) {
             }
 
             Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-                Text("Contributions History", color = Color.White, modifier = Modifier.weight(1f))
-                Text("View Analytics", color = Color(0xFF00C4B4))
+                Text("Contributions History", color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+                Text("View Analytics", color = MaterialTheme.colorScheme.primary)
             }
 
             LazyColumn(modifier = Modifier.padding(16.dp)) {
@@ -109,7 +114,7 @@ fun GoalDetailScreen(navController: NavHostController) {
                 }
             }
 
-            Text("Goal started on Sep 01, 2023", color = Color.Gray, modifier = Modifier.padding(16.dp))
+            Text("Goal started on Sep 01, 2023", color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(16.dp))
         }
     }
 }

@@ -42,7 +42,18 @@ import androidx.navigation.NavHostController
 import com.darlingson.ndalamagoals.data.appViewModel
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,12 +61,26 @@ fun CreateGoalScreen(navController: NavHostController, mainViewModel: appViewMod
     var name by remember { mutableStateOf("") }
     var desc by remember { mutableStateOf("") }
     var target by remember { mutableStateOf("") }
-    var date by remember { mutableStateOf("") }
+    var creationTimestamp by remember { mutableStateOf(0L) }
+    var targetTimestamp by remember { mutableStateOf(0L) }
     var isPriority by remember { mutableStateOf(false) }
     var isPrivate by remember { mutableStateOf(false) }
     var frequency by remember { mutableStateOf("Monthly") }
-    var targetDate by remember { mutableStateOf("") }
     var status by remember { mutableStateOf("active") }
+
+    // Date picker states
+    var showCreationDatePicker by remember { mutableStateOf(false) }
+    var showTargetDatePicker by remember { mutableStateOf(false) }
+
+    // Dropdown states
+    var frequencyExpanded by remember { mutableStateOf(false) }
+
+    val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+
+    val frequencyOptions = listOf(
+        "Daily", "Weekly", "Bi-weekly", "Monthly", "Bi-monthly",
+        "Tri-monthly", "Quarterly", "6 months", "Yearly"
+    )
 
     Scaffold(
         topBar = {
@@ -79,20 +104,76 @@ fun CreateGoalScreen(navController: NavHostController, mainViewModel: appViewMod
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Text Inputs
             OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Goal Name") }, modifier = Modifier.fillMaxWidth())
             OutlinedTextField(value = desc, onValueChange = { desc = it }, label = { Text("Description") }, modifier = Modifier.fillMaxWidth())
             OutlinedTextField(value = target, onValueChange = { target = it }, label = { Text("Target Amount") }, modifier = Modifier.fillMaxWidth())
 
-            // Date Inputs (Manual Long/String)
-            OutlinedTextField(value = date, onValueChange = { date = it }, label = { Text("Creation Date (Long/Timestamp)") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = targetDate, onValueChange = { targetDate = it }, label = { Text("Target Date (Long/Timestamp)") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(
+                value = if (creationTimestamp != 0L) dateFormat.format(Date(creationTimestamp)) else "",
+                onValueChange = { },
+                label = { Text("Goal StartDate") },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { showCreationDatePicker = true }) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = "Select Date"
+                        )
+                    }
+                }
+            )
 
-            // Dropdowns/Selectors
-            OutlinedTextField(value = frequency, onValueChange = { frequency = it }, label = { Text("Frequency (Weekly/Monthly)") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = status, onValueChange = { status = it }, label = { Text("Status (active/paused/completed)") }, modifier = Modifier.fillMaxWidth())
+            // Target Date Picker
+            OutlinedTextField(
+                value = if (targetTimestamp != 0L) dateFormat.format(Date(targetTimestamp)) else "",
+                onValueChange = { },
+                label = { Text("Target Date") },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { showTargetDatePicker = true }) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = "Select Date"
+                        )
+                    }
+                }
+            )
 
-            // Booleans
+            ExposedDropdownMenuBox(
+                expanded = frequencyExpanded,
+                onExpandedChange = { frequencyExpanded = !frequencyExpanded }
+            ) {
+                OutlinedTextField(
+                    value = frequency,
+                    onValueChange = { },
+                    label = { Text("Frequency") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    readOnly = true,
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = frequencyExpanded)
+                    }
+                )
+
+                ExposedDropdownMenu(
+                    expanded = frequencyExpanded,
+                    onDismissRequest = { frequencyExpanded = false }
+                ) {
+                    frequencyOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = {
+                                frequency = option
+                                frequencyExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Private Goal")
                 Switch(checked = isPrivate, onCheckedChange = { isPrivate = it })
@@ -112,16 +193,66 @@ fun CreateGoalScreen(navController: NavHostController, mainViewModel: appViewMod
                         name = name,
                         desc = desc,
                         target = target.toDoubleOrNull() ?: 0.0,
-                        date = date.toLongOrNull() ?: 0L,
+                        date = creationTimestamp,
                         isPrivate = isPrivate,
                         isPriority = isPriority,
                         frequency = frequency,
-                        targetDate = targetDate.toLongOrNull() ?: 0L,
+                        targetDate = targetTimestamp,
                     )
                     navController.popBackStack()
                 }
             ) {
                 Text("Save Goal")
+            }
+        }
+    }
+
+    if (showCreationDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showCreationDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = { showCreationDatePicker = false }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCreationDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            val datePickerState = rememberDatePickerState(
+                initialDisplayMode = DisplayMode.Picker
+            )
+            DatePicker(state = datePickerState)
+
+            datePickerState.selectedDateMillis?.let { millis ->
+                creationTimestamp = millis
+            }
+        }
+    }
+
+    if (showTargetDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showTargetDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = { showTargetDatePicker = false }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTargetDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            val datePickerState = rememberDatePickerState(
+                initialDisplayMode = DisplayMode.Picker
+            )
+            DatePicker(state = datePickerState)
+
+            datePickerState.selectedDateMillis?.let { millis ->
+                targetTimestamp = millis
             }
         }
     }

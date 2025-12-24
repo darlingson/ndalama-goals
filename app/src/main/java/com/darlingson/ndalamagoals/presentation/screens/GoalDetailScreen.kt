@@ -221,7 +221,7 @@ private fun formatDate(timestamp: Long): String {
     }
 }
 
-private data class GoalProgressData(
+data class GoalProgressData(
     val progress: Float,
     val savedAmount: Double,
     val expectedAmount: Double,

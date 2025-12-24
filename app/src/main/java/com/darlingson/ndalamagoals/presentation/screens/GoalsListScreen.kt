@@ -1,38 +1,13 @@
 package com.darlingson.ndalamagoals.presentation.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,10 +18,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.darlingson.ndalamagoals.data.appViewModel
 import com.darlingson.ndalamagoals.data.entities.Goal
+import com.darlingson.ndalamagoals.data.entities.Contribution
 import com.darlingson.ndalamagoals.presentation.components.GoalItem
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.getValue
 
@@ -54,8 +31,13 @@ import androidx.compose.runtime.getValue
 @Composable
 fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewModel) {
     val goals by mainViewModel.allGoals.collectAsState(initial = emptyList())
+    val contributions by mainViewModel.allContributions.collectAsState(initial = emptyList())
 
-    val totalSaved = goals.sumOf { it.target * getProgressPercentage(it) }
+    // Calculate totals using sophisticated progress calculation
+    val totalSaved = goals.sumOf { goal ->
+        val goalContributions = contributions.filter { it.goalId == goal.id }
+        calculateGoalProgress(goal, goalContributions).savedAmount
+    }
     val totalTarget = goals.sumOf { it.target }
 
     Scaffold(
@@ -103,6 +85,7 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
 
             val priorityGoal = goals.firstOrNull { it.isPriority }
             if (priorityGoal != null) {
+                val progressData = calculateGoalProgress(priorityGoal, contributions.filter { it.goalId == priorityGoal.id })
                 Text("Priority Goal", color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(16.dp))
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.padding(horizontal = 16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp)) {
@@ -110,19 +93,20 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
                             modifier = Modifier.size(100.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)),
                             contentAlignment = Alignment.Center
                         ) {
-                            val progress = getProgressPercentage(priorityGoal)
+
                             CircularProgressIndicator(
-                                progress = progress,
+                                progress = progressData.progress,
                                 color = MaterialTheme.colorScheme.primary,
                                 strokeWidth = 8.dp,
                                 modifier = Modifier.size(80.dp)
                             )
-                            Text("${(progress * 100).toInt()}%", color = MaterialTheme.colorScheme.onSurface)
+                            Text("${(progressData.progress * 100).toInt()}%", color = MaterialTheme.colorScheme.onSurface)
                         }
                         Spacer(Modifier.width(16.dp))
                         Column {
                             Text(priorityGoal.name, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
-                            Text("$${getSavedAmount(priorityGoal)} / $${priorityGoal.target}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("$${String.format("%.0f", progressData.savedAmount)} / $${priorityGoal.target}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("Status: ${progressData.status}", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
                             Spacer(Modifier.height(8.dp))
                             Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
                                 Text("+")
@@ -139,14 +123,17 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
 
             LazyColumn {
                 items(goals.filter { it.status == "active" }) { goal ->
+                    val goalContributions = contributions.filter { it.goalId == goal.id }
+                    val progressData = calculateGoalProgress(goal, goalContributions)
+
                     GoalItem(
                         icon = Icons.Default.Share,
                         name = goal.name,
-                        amount = "$${getSavedAmount(goal)}",
+                        amount = "$${String.format("%.0f", progressData.savedAmount)}",
                         target = "$${goal.target}",
                         due = "Due ${formatDate(goal.targetDate)}",
-                        progress = getProgressPercentage(goal),
-                        status = getGoalStatus(goal),
+                        progress = progressData.progress,
+                        status = progressData.status,
                         onClick = { navController.navigate("goal_detail/${goal.id}") }
                     )
                 }
@@ -165,17 +152,81 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
     }
 }
 
-private fun getProgressPercentage(goal: Goal): Float {
-    // This is a placeholder - you might want to track actual savings/contributions
-    // For now, using a random progress based on creation date
-    val daysSinceCreation = (System.currentTimeMillis() - goal.date) / (1000 * 60 * 60 * 24)
-    val totalDays = (goal.targetDate - goal.date) / (1000 * 60 * 60 * 24)
-    return if (totalDays > 0) (daysSinceCreation.toFloat() / totalDays.toFloat()).coerceAtMost(1f) else 0f
+private fun calculateGoalProgress(goal: Goal, contributions: List<Contribution>): GoalProgressData {
+    val currentTime = System.currentTimeMillis()
+    val totalDuration = goal.targetDate - goal.date
+    val elapsedDuration = currentTime - goal.date
+
+    if (totalDuration <= 0) return GoalProgressData(0f, 0.0, 0.0, "Invalid timeline")
+
+    // Calculate actual saved amount
+    val savedAmount = contributions.sumOf { it.amount }
+
+    // Calculate expected contributions based on frequency
+    val expectedContributions = calculateExpectedContributions(goal, currentTime)
+    val contributionAmount = calculateContributionAmount(goal)
+    val expectedAmount = expectedContributions * contributionAmount
+
+    // Calculate progress based on target completion
+    val progress = (savedAmount / goal.target).toFloat().coerceIn(0f, 1f)
+
+    // Determine status based on expected vs actual
+    val status = when {
+        progress >= 1f -> "Completed"
+        savedAmount >= expectedAmount -> "On Track"
+        savedAmount >= expectedAmount * 0.8 -> "Slightly Behind"
+        savedAmount >= expectedAmount * 0.5 -> "Behind"
+        else -> "Significantly Behind"
+    }
+
+    return GoalProgressData(progress, savedAmount, expectedAmount, status)
 }
 
-private fun getSavedAmount(goal: Goal): String {
-    val progress = getProgressPercentage(goal)
-    return String.format("%.0f", goal.target * progress)
+private fun calculateExpectedContributions(goal: Goal, currentTime: Long): Int {
+    val startDate = goal.date
+    val elapsedDuration = currentTime - startDate
+
+    if (elapsedDuration <= 0) return 0
+
+    val frequency = goal.contributionFrequency.lowercase()
+    val daysElapsed = TimeUnit.MILLISECONDS.toDays(elapsedDuration)
+
+    return when (frequency) {
+        "daily" -> daysElapsed
+        "weekly" -> daysElapsed / 7
+        "bi-weekly" -> daysElapsed / 14
+        "monthly" -> daysElapsed / 30
+        "bi-monthly" -> daysElapsed / 60
+        "tri-monthly" -> daysElapsed / 90
+        "quarterly" -> daysElapsed / 90
+        "6 months" -> daysElapsed / 180
+        "yearly" -> daysElapsed / 365
+        else -> daysElapsed / 30 // Default to monthly
+    }.toInt().coerceAtLeast(0)
+}
+
+private fun calculateContributionAmount(goal: Goal): Double {
+    val frequency = goal.contributionFrequency.lowercase()
+    val totalDuration = goal.targetDate - goal.date
+
+    if (totalDuration <= 0) return goal.target
+
+    val totalDays = TimeUnit.MILLISECONDS.toDays(totalDuration)
+
+    val totalPeriods = when (frequency) {
+        "daily" -> totalDays
+        "weekly" -> totalDays / 7
+        "bi-weekly" -> totalDays / 14
+        "monthly" -> totalDays / 30
+        "bi-monthly" -> totalDays / 60
+        "tri-monthly" -> totalDays / 90
+        "quarterly" -> totalDays / 90
+        "6 months" -> totalDays / 180
+        "yearly" -> totalDays / 365
+        else -> totalDays / 30 // Default to monthly
+    }.toInt().coerceAtLeast(1)
+
+    return goal.target / totalPeriods
 }
 
 private fun formatDate(timestamp: Long): String {
@@ -186,14 +237,10 @@ private fun formatDate(timestamp: Long): String {
         "No due date"
     }
 }
-
-private fun getGoalStatus(goal: Goal): String {
-    val progress = getProgressPercentage(goal)
-    return when {
-        progress >= 1f -> "Completed"
-        progress > 0.8f -> "Almost There"
-        progress > 0.5f -> "On Track"
-        progress > 0.3f -> "Behind"
-        else -> "Need Attention"
-    }
-}
+//
+//private data class GoalProgressData(
+//    val progress: Float,
+//    val savedAmount: Double,
+//    val expectedAmount: Double,
+//    val status: String
+//)

@@ -38,11 +38,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.darlingson.ndalamagoals.data.appViewModel
 import com.darlingson.ndalamagoals.presentation.components.ContributionItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GoalDetailScreen(navController: NavHostController) {
+fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(

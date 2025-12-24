@@ -15,20 +15,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.darlingson.ndalamagoals.data.appViewModel
 import com.darlingson.ndalamagoals.ui.theme.NdalamaGoalsTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddContributionScreen(
     onBack: () -> Unit,
-    onSave: () -> Unit
+    onSave: () -> Unit,
+    mainViewModel: appViewModel
 ) {
     var amount by remember { mutableStateOf("0") }
     var selectedCategory by remember { mutableStateOf("Savings") }
@@ -226,7 +227,8 @@ fun AddContributionScreenPreview() {
     NdalamaGoalsTheme {
         AddContributionScreen(
             onBack = {},
-            onSave = {}
+            onSave = {},
+            mainViewModel = mainViewModel
         )
     }
 }

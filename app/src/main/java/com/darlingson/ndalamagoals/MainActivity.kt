@@ -40,19 +40,19 @@ class MainActivity : ComponentActivity() {
                 val mainViewModel: appViewModel = viewModel(factory = factory)
 
                 NavHost(navController = navController, startDestination = "goals_list") {
-                    composable("goals_list") { GoalsListScreen(navController) }
-                    composable("goal_detail") { GoalDetailScreen(navController) }
-                    composable("create_goal") { CreateGoalScreen(navController) }
-                    composable("edit_goal") { CreateGoalScreen(navController) }
+                    composable("goals_list") { GoalsListScreen(navController, mainViewModel) }
+                    composable("goal_detail") { GoalDetailScreen(navController, mainViewModel) }
+                    composable("create_goal") { CreateGoalScreen(navController, mainViewModel) }
+                    composable("edit_goal") { CreateGoalScreen(navController, mainViewModel) }
                     composable("add_contribution") {
                         AddContributionScreen(
                             onBack = {
                                 navController.popBackStack()
                             },
                             onSave = {
-                                // Add your save logic here, then navigate back
                                 navController.popBackStack()
-                            }
+                            },
+                            mainViewModel
                         )
                     }
                 }

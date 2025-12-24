@@ -35,10 +35,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.darlingson.ndalamagoals.data.appViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateGoalScreen(navController: NavHostController) {
+fun CreateGoalScreen(navController: NavHostController, mainViewModel: appViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(

@@ -221,14 +221,3 @@ fun AddContributionScreen(
         }
     }
 }
-@Preview(showBackground = true)
-@Composable
-fun AddContributionScreenPreview() {
-    NdalamaGoalsTheme {
-        AddContributionScreen(
-            onBack = {},
-            onSave = {},
-            mainViewModel = mainViewModel
-        )
-    }
-}

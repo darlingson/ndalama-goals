@@ -1,4 +1,4 @@
-package com.darlingson.ndalamagoals.presentations.screens
+package com.darlingson.ndalamagoals.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

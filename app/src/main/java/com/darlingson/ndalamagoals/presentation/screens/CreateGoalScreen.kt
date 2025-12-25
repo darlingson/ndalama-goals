@@ -1,5 +1,7 @@
 package com.darlingson.ndalamagoals.presentation.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -24,6 +27,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -37,13 +41,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.darlingson.ndalamagoals.data.appViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
+import java.text.NumberFormat
+import com.darlingson.ndalamagoals.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateGoalScreen(navController: NavHostController, mainViewModel: appViewModel) {
@@ -63,10 +74,40 @@ fun CreateGoalScreen(navController: NavHostController, mainViewModel: appViewMod
 
     val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
 
+    val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
+
     val frequencyOptions = listOf(
         "Daily", "Weekly", "Bi-weekly", "Monthly", "Bi-monthly",
         "Tri-monthly", "Quarterly", "6 months", "Yearly"
     )
+
+    val targetAmount = target.toDoubleOrNull() ?: 0.0
+
+    val requiredContribution = if (targetAmount > 0 && creationTimestamp > 0 && targetTimestamp > 0 && targetTimestamp > creationTimestamp) {
+        val diffInMillis = targetTimestamp - creationTimestamp
+        val diffInDays = diffInMillis / (1000 * 60 * 60 * 24)
+
+        val daysPerFrequency = when (frequency) {
+            "Daily" -> 1
+            "Weekly" -> 7
+            "Bi-weekly" -> 14
+            "Monthly" -> 30
+            "Bi-monthly" -> 60
+            "Tri-monthly", "Quarterly" -> 90
+            "6 months" -> 180
+            "Yearly" -> 365
+            else -> 30
+        }
+
+        if (diffInDays > 0 && daysPerFrequency > 0) {
+            val totalIntervals = diffInDays.toDouble() / daysPerFrequency
+            targetAmount / totalIntervals
+        } else {
+            0.0
+        }
+    } else {
+        0.0
+    }
 
     Scaffold(
         topBar = {
@@ -182,6 +223,54 @@ fun CreateGoalScreen(navController: NavHostController, mainViewModel: appViewMod
                 Switch(
                     checked = isPriority, onCheckedChange = { isPriority = it },
                 )
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(240.dp)
+                    .padding(top = 16.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .paint(
+                            painter = painterResource(id = R.drawable.dollar_coins_stack),
+                            contentScale = ContentScale.FillBounds
+                        )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color.Black.copy(alpha = 0.7f)
+                                    )
+                                )
+                            )
+                    )
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "Required Contribution",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(
+                            text = "${currencyFormat.format(requiredContribution)} / $frequency",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "To reach your goal by the target date.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
 
             Spacer(Modifier.height(24.dp))

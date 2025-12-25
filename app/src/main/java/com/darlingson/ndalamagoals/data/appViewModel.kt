@@ -49,4 +49,9 @@ class appViewModel(private val contributionRepository: ContributionRepository, p
             goalRepository.insert(newGoal)
         }
     }
+    fun updateGoal(goal: Goal) {
+        viewModelScope.launch {
+            goalRepository.update(goal)
+        }
+    }
 }

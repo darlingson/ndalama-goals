@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.darlingson.ndalamagoals.data.entities.Goal
 import kotlinx.coroutines.flow.Flow
 
@@ -14,4 +15,7 @@ interface GoalDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertGoal(goal: Goal)
+
+    @Update
+    suspend fun updateGoal(goal: Goal)
 }

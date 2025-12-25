@@ -20,6 +20,8 @@ import com.darlingson.ndalamagoals.presentation.screens.GoalDetailScreen
 import com.darlingson.ndalamagoals.presentation.screens.GoalsListScreen
 import com.darlingson.ndalamagoals.ui.theme.NdalamaGoalsTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.darlingson.ndalamagoals.presentation.screens.EditGoalScreen
+import com.darlingson.ndalamagoals.presentation.screens.MyGoalsScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +48,10 @@ class MainActivity : ComponentActivity() {
                         GoalDetailScreen(navController, mainViewModel, goalId)
                     }
                     composable("create_goal") { CreateGoalScreen(navController, mainViewModel) }
-                    composable("edit_goal") { CreateGoalScreen(navController, mainViewModel) }
+                    composable("edit_goal/{goalId}") { backStackEntry ->
+                        val goalId = backStackEntry.arguments?.getString("goalId")?.toIntOrNull()
+                        EditGoalScreen(navController, mainViewModel, goalId)
+                    }
                     composable("add_contribution/{goalId}") { backStackEntry ->
                         val goalId = backStackEntry.arguments?.getString("goalId")?.toIntOrNull()
                         AddContributionScreen(
@@ -60,6 +65,7 @@ class MainActivity : ComponentActivity() {
                             goalId
                         )
                     }
+                    composable("my_goals") { MyGoalsScreen(navController, mainViewModel) }
                 }
             }
         }

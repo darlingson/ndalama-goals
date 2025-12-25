@@ -1,5 +1,12 @@
 package com.darlingson.ndalamagoals.presentation.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,7 +32,9 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.graphicsLayer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,13 +66,89 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { navController.navigate("create_goal") },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text("Add New Goal") }
-            )
+            // 1. State to track if the menu is expanded
+            var isFabExpanded by remember { mutableStateOf(false) }
+
+            // 2. Use a Column to stack the sub-buttons ABOVE the main button
+            Column(
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier.padding(bottom = 16.dp) // Space from bottom of screen
+            ) {
+
+                // 3. Secondary Buttons (Animated)
+                AnimatedVisibility(
+                    visible = isFabExpanded,
+                    enter = slideInVertically(initialOffsetY = { it }) + expandVertically(expandFrom = Alignment.Bottom) + fadeIn(),
+                    exit = slideOutVertically(targetOffsetY = { it }) + shrinkVertically(shrinkTowards = Alignment.Bottom) + fadeOut()
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.spacedBy(12.dp) // Space between sub-buttons
+                    ) {
+
+                        // --- Option 1: All Goals ---
+                        // WhatsApp style: Text label on the left, Button on the right
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Label
+                            Text(
+                                text = "All Goals",
+                                modifier = Modifier.padding(end = 12.dp),
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                            // Small Button
+                            SmallFloatingActionButton(
+                                onClick = {
+                                    isFabExpanded = false // Close menu
+                                    navController.navigate("my_goals")
+                                },
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ) {
+                                Icon(Icons.AutoMirrored.Filled.Notes, contentDescription = null)
+                            }
+                        }
+
+                        // --- Option 2: Add New Goal ---
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Add New Goal",
+                                modifier = Modifier.padding(end = 12.dp),
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                            SmallFloatingActionButton(
+                                onClick = {
+                                    isFabExpanded = false
+                                    navController.navigate("create_goal")
+                                },
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = null)
+                            }
+                        }
+                    }
+                }
+
+                // 4. Main Button
+                FloatingActionButton(
+                    onClick = { isFabExpanded = !isFabExpanded },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ) {
+                    // Rotate the icon 45 degrees when expanded to look like an "X"
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Menu",
+                        modifier = Modifier.graphicsLayer {
+                            rotationZ = if (isFabExpanded) 45f else 0f
+                        }
+                    )
+                }
+            }
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize().background(MaterialTheme.colorScheme.background)) {

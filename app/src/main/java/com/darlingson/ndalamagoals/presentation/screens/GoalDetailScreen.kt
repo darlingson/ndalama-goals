@@ -104,7 +104,12 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
             Row(modifier = Modifier.padding(16.dp)) {
                 Button(onClick = {}, modifier = Modifier.weight(1f)) { Icon(Icons.Default.Share, contentDescription = null); Text("Link Entry") }
                 Spacer(Modifier.width(8.dp))
-                Button(onClick = {}, modifier = Modifier.weight(1f)) { Icon(Icons.Default.Edit, contentDescription = null); Text("Edit Goal") }
+                Button(
+                    onClick = {navController.navigate("edit_goal/${goal.id}")}, modifier = Modifier.weight(1f)
+                ) {
+                    Icon(Icons.Default.Edit, contentDescription = null);
+                    Text("Edit Goal")
+                }
                 Spacer(Modifier.width(8.dp))
                 Button(onClick = {}, modifier = Modifier.weight(1f)) { Icon(Icons.Default.Pause, contentDescription = null); Text("Pause") }
             }

@@ -24,4 +24,7 @@ interface GoalDao {
 
     @Query("UPDATE goals SET status = 'completed' WHERE id = :goalId")
     suspend fun complete(goalId: Int)
+
+    @Query("UPDATE goals SET status = 'active' WHERE id = :goalId")
+    suspend fun activate(goalId: Int)
 }

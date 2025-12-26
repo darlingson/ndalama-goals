@@ -108,15 +108,37 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                     Icon(Icons.Default.Edit, contentDescription = null);
                     Text("Edit Goal")
                 }
-                Spacer(Modifier.width(8.dp))
-                Button(onClick = {
-                    mainViewModel.pauseGoal(goal.id)
-                }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.Pause, contentDescription = null); Text("Pause") }
-
-                Spacer(Modifier.width(8.dp))
-                Button(onClick = {
-                    mainViewModel.completeGoal(goal.id)
-                }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.Check, contentDescription = null); Text("Mark as complete") }
+                if(goal.status == "active") {
+                    Spacer(Modifier.width(8.dp))
+                    Button(onClick = {
+                        mainViewModel.pauseGoal(goal.id)
+                    }, modifier = Modifier.weight(1f)) {
+                        Icon(
+                            Icons.Default.Pause,
+                            contentDescription = null
+                        ); Text("Pause")
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Button(onClick = {
+                        mainViewModel.completeGoal(goal.id)
+                    }, modifier = Modifier.weight(1f)) {
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = null
+                        ); Text("Mark as complete")
+                    }
+                }
+                if (goal.status != "active"){
+                    Spacer(Modifier.width(8.dp))
+                    Button(onClick = {
+                        mainViewModel.activateGoal(goal.id)
+                    }, modifier = Modifier.weight(1f)) {
+                        Icon(
+                            Icons.Default.Pause,
+                            contentDescription = null
+                        ); Text("Activate")
+                    }
+                }
             }
 
             Row(modifier = Modifier.padding(horizontal = 16.dp)) {

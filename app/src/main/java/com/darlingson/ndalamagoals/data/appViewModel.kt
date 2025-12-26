@@ -65,4 +65,10 @@ class appViewModel(private val contributionRepository: ContributionRepository, p
             goalRepository.complete(goalId)
         }
     }
+
+    fun activateGoal(goalId: Int){
+        viewModelScope.launch {
+            goalRepository.activate(goalId)
+        }
+    }
 }

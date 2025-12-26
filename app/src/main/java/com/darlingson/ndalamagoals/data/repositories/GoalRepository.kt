@@ -19,5 +19,7 @@ class GoalRepository(private val goalDao: GoalDao) {
     suspend fun complete(goalId: Int) {
         goalDao.complete(goalId)
     }
-
+    suspend fun activate(goalId: Int) {
+        goalDao.activate(goalId)
+    }
 }

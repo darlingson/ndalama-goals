@@ -54,4 +54,15 @@ class appViewModel(private val contributionRepository: ContributionRepository, p
             goalRepository.update(goal)
         }
     }
+    fun pauseGoal(goalId: Int){
+        viewModelScope.launch {
+            goalRepository.pause(goalId)
+        }
+    }
+
+    fun completeGoal(goalId: Int){
+        viewModelScope.launch {
+            goalRepository.complete(goalId)
+        }
+    }
 }

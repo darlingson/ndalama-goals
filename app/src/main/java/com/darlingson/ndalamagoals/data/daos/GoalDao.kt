@@ -18,4 +18,10 @@ interface GoalDao {
 
     @Update
     suspend fun updateGoal(goal: Goal)
+
+    @Query("UPDATE goals SET status = 'paused' WHERE id = :goalId")
+    suspend fun pauseGoal(goalId: Int)
+
+    @Query("UPDATE goals SET status = 'completed' WHERE id = :goalId")
+    suspend fun complete(goalId: Int)
 }

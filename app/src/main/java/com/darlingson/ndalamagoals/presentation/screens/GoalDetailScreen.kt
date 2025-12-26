@@ -102,8 +102,6 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
             }
 
             Row(modifier = Modifier.padding(16.dp)) {
-                Button(onClick = {}, modifier = Modifier.weight(1f)) { Icon(Icons.Default.Share, contentDescription = null); Text("Link Entry") }
-                Spacer(Modifier.width(8.dp))
                 Button(
                     onClick = {navController.navigate("edit_goal/${goal.id}")}, modifier = Modifier.weight(1f)
                 ) {
@@ -111,7 +109,14 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                     Text("Edit Goal")
                 }
                 Spacer(Modifier.width(8.dp))
-                Button(onClick = {}, modifier = Modifier.weight(1f)) { Icon(Icons.Default.Pause, contentDescription = null); Text("Pause") }
+                Button(onClick = {
+                    mainViewModel.pauseGoal(goal.id)
+                }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.Pause, contentDescription = null); Text("Pause") }
+
+                Spacer(Modifier.width(8.dp))
+                Button(onClick = {
+                    mainViewModel.completeGoal(goal.id)
+                }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.Check, contentDescription = null); Text("Mark as complete") }
             }
 
             Row(modifier = Modifier.padding(horizontal = 16.dp)) {

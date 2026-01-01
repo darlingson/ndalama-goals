@@ -89,6 +89,8 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                     Text("$${String.format("%.0f", goal.target - savedAmount)} left", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     LinearProgressIndicator(progress = progress, color = MaterialTheme.colorScheme.primary, modifier = Modifier.fillMaxWidth())
                     Text("Status: $status", color = MaterialTheme.colorScheme.primary)
+                    Text("purpose of goal: ${goal.goalPurpose}")
+                    Text("Goal type: ${goal.goalType}")
 
                     // Show expected vs actual
                     if (expectedAmount > 0) {

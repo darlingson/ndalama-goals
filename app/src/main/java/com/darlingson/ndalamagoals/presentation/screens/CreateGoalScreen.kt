@@ -66,11 +66,14 @@ fun CreateGoalScreen(navController: NavHostController, mainViewModel: appViewMod
     var isPriority by remember { mutableStateOf(false) }
     var isPrivate by remember { mutableStateOf(false) }
     var frequency by remember { mutableStateOf("Monthly") }
+    var goalType by remember { mutableStateOf("Savings") }
+    var goalPurpose by remember { mutableStateOf("") }
 
     var showCreationDatePicker by remember { mutableStateOf(false) }
     var showTargetDatePicker by remember { mutableStateOf(false) }
 
     var frequencyExpanded by remember { mutableStateOf(false) }
+    var goalTypeExpanded by remember { mutableStateOf(false) }
 
     val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
 
@@ -80,6 +83,7 @@ fun CreateGoalScreen(navController: NavHostController, mainViewModel: appViewMod
         "Daily", "Weekly", "Bi-weekly", "Monthly", "Bi-monthly",
         "Tri-monthly", "Quarterly", "6 months", "Yearly"
     )
+    val goalTypeOptions = listOf("Savings", "Investment")
 
     val targetAmount = target.toDoubleOrNull() ?: 0.0
 
@@ -215,6 +219,46 @@ fun CreateGoalScreen(navController: NavHostController, mainViewModel: appViewMod
                 }
             }
 
+            ExposedDropdownMenuBox(
+                expanded = goalTypeExpanded,
+                onExpandedChange = { goalTypeExpanded = !goalTypeExpanded }
+            ) {
+                OutlinedTextField(
+                    value = goalType,
+                    onValueChange = { },
+                    label = { Text("Goal Type") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    readOnly = true,
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = goalTypeExpanded)
+                    }
+                )
+
+                ExposedDropdownMenu(
+                    expanded = goalTypeExpanded,
+                    onDismissRequest = { goalTypeExpanded = false }
+                ) {
+                    goalTypeOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = {
+                                goalType = option
+                                goalTypeExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+            OutlinedTextField(
+                value = goalPurpose,
+                onValueChange = { goalPurpose = it },
+                label = { Text("Goal Purpose") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Private Goal")
                 Switch(checked = isPrivate, onCheckedChange = { isPrivate = it })
@@ -287,6 +331,7 @@ fun CreateGoalScreen(navController: NavHostController, mainViewModel: appViewMod
                         isPriority = isPriority,
                         frequency = frequency,
                         targetDate = targetTimestamp,
+                        type = goalType
                     )
                     navController.popBackStack()
                 }

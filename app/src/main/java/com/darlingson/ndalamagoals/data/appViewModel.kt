@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.darlingson.ndalamagoals.data.entities.GoalType
 
 class appViewModel(private val contributionRepository: ContributionRepository, private val goalRepository: GoalRepository) : ViewModel() {
 
@@ -33,7 +34,7 @@ class appViewModel(private val contributionRepository: ContributionRepository, p
         }
     }
 
-    fun addGoal(name: String, desc: String, date: Long, isPrivate: Boolean?, isPriority: Boolean?, frequency: String, targetDate: Long, target: Double) {
+    fun addGoal(name: String, desc: String, date: Long, isPrivate: Boolean?, isPriority: Boolean?, frequency: String, targetDate: Long, target: Double, type: String = "SAVINGS") {
         viewModelScope.launch {
             val newGoal = Goal(
                 name = name,
@@ -44,7 +45,9 @@ class appViewModel(private val contributionRepository: ContributionRepository, p
                 isPrivate = isPrivate == true,
                 contributionFrequency = frequency,
                 targetDate = targetDate,
-                status = "active"
+                status = "active",
+                goalType = GoalType.valueOf(type.uppercase()),
+                goalPurpose = type
             )
             goalRepository.insert(newGoal)
         }

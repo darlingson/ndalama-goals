@@ -14,5 +14,12 @@ data class Goal(
     val isPrivate: Boolean,
     val contributionFrequency: String,
     val targetDate: Long,
-    val status: String //active, inactive, completed, paused
+    val status: String, //active, inactive, completed, paused
+    val goalType: GoalType,
+    val goalPurpose: String
 )
+
+enum class GoalType {
+    INVESTMENT,
+    SAVINGS
+}

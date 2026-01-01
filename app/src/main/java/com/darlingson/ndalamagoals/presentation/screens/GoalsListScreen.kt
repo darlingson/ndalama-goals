@@ -54,7 +54,7 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
             TopAppBar(
                 title = { Text("My Goals") },
                 actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {navController.navigate("profile")}) {
                         Icon(Icons.Default.AccountCircle, contentDescription = "Profile")
                     }
                 },

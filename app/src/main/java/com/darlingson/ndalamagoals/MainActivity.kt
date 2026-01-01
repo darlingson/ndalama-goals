@@ -22,6 +22,7 @@ import com.darlingson.ndalamagoals.presentation.screens.EditGoalScreen
 import com.darlingson.ndalamagoals.presentation.screens.GoalDetailScreen
 import com.darlingson.ndalamagoals.presentation.screens.GoalsListScreen
 import com.darlingson.ndalamagoals.presentation.screens.MyGoalsScreen
+import com.darlingson.ndalamagoals.presentation.screens.ProfileScreen
 import com.darlingson.ndalamagoals.ui.theme.NdalamaGoalsTheme
 
 class MainActivity : ComponentActivity() {
@@ -109,6 +110,7 @@ class MainActivity : ComponentActivity() {
                     composable(
                         "my_goals",
                     ) { MyGoalsScreen(navController, mainViewModel) }
+                    composable("profile") { ProfileScreen(navController) }
                 }
             }
         }

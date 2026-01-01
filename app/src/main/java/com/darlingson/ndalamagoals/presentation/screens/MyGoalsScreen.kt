@@ -1,6 +1,6 @@
 package com.darlingson.ndalamagoals.presentation.screens
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,7 +21,6 @@ import androidx.navigation.NavHostController
 import com.darlingson.ndalamagoals.data.appViewModel
 import com.darlingson.ndalamagoals.data.entities.Goal
 import com.darlingson.ndalamagoals.data.entities.Contribution
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -41,7 +40,6 @@ fun MyGoalsScreen(navController: NavHostController, mainViewModel: appViewModel)
 
     var selectedTab by remember { mutableStateOf("Active") }
 
-    // Calculate totals using sophisticated progress calculation
     val totalSaved = goals.sumOf { goal ->
         val goalContributions = contributions.filter { it.goalId == goal.id }
         calculateGoalProgress(goal, goalContributions).savedAmount
@@ -52,26 +50,30 @@ fun MyGoalsScreen(navController: NavHostController, mainViewModel: appViewModel)
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Goals", color = Color.White) },
+                title = { Text("My Goals") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
                     IconButton(onClick = { /* search functionality could be added here */ }) {
-                        Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White)
+                        Icon(Icons.Default.Search, contentDescription = "Search")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = TopBarColor)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         },
-        containerColor = DarkBackground,
+        containerColor = MaterialTheme.colorScheme.surface,
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { navController.navigate("create_goal") },
-                containerColor = AccentGreen,
-                contentColor = Color.Black
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
                 Icon(Icons.Default.Add, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
@@ -92,8 +94,8 @@ fun MyGoalsScreen(navController: NavHostController, mainViewModel: appViewModel)
                         "Completed" -> 2
                         else -> 0
                     },
-                    containerColor = CardBackground,
-                    contentColor = AccentGreen
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ) {
                     listOf("Active", "Paused", "Completed").forEach { title ->
                         Tab(
@@ -107,23 +109,23 @@ fun MyGoalsScreen(navController: NavHostController, mainViewModel: appViewModel)
 
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Card(colors = CardDefaults.cardColors(containerColor = CardBackground), modifier = Modifier.weight(1f)) {
+                    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.weight(1f)) {
                         Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("TOTAL SAVED", color = Color.Gray, fontSize = 12.sp)
-                            Text("$${String.format("%,.0f", totalSaved)}", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                            Text("TOTAL SAVED", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                            Text("$${String.format("%,.0f", totalSaved)}", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, fontSize = 24.sp)
                         }
                     }
-                    Card(colors = CardDefaults.cardColors(containerColor = CardBackground), modifier = Modifier.weight(1f)) {
+                    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.weight(1f)) {
                         Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("GOALS ACTIVE", color = Color.Gray, fontSize = 12.sp)
-                            Text("$activeGoals / $totalGoals", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                            Text("GOALS ACTIVE", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                            Text("$activeGoals / $totalGoals", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, fontSize = 24.sp)
                         }
                     }
                 }
             }
 
             item {
-                Text("${selectedTab.uppercase()} GOALS", color = Color.White, fontWeight = FontWeight.Medium)
+                Text("${selectedTab.uppercase()} GOALS", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium)
             }
 
             // Filter goals based on selected tab
@@ -156,7 +158,7 @@ fun MyGoalsScreen(navController: NavHostController, mainViewModel: appViewModel)
             if (filteredGoals.isEmpty()) {
                 item {
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = CardBackground),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(
@@ -189,23 +191,24 @@ fun GoalListItem(
     onClick: () -> Unit
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = CardBackground),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimary)
     ) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, contentDescription = null, tint = AccentGreen, modifier = Modifier.size(40.dp))
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(40.dp))
             Spacer(Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(name, color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(name, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.weight(1f))
                     if (status != null) {
                         AssistChip(
                             onClick = {},
                             label = { Text(status) },
                             colors = AssistChipDefaults.assistChipColors(
-                                containerColor = getStatusColor(status).copy(0.2f),
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                 labelColor = getStatusColor(status)
                             )
                         )

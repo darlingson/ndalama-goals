@@ -1,5 +1,10 @@
 package com.darlingson.ndalamagoals.presentation.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,7 +29,18 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import androidx.compose.runtime.getValue
+import com.darlingson.ndalamagoals.presentation.components.AnimatedActionButton
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.Spring
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewModel, goalId: Int?) {
@@ -45,6 +61,10 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
     val savedAmount = progressData.savedAmount
     val expectedAmount = progressData.expectedAmount
     val status = progressData.status
+    val buttonSpring = spring<Float>(
+        stiffness = Spring.StiffnessLow,
+        dampingRatio = Spring.DampingRatioMediumBouncy
+    )
 
     Scaffold(
         topBar = {
@@ -103,45 +123,86 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                 }
             }
 
-            Row(modifier = Modifier.padding(16.dp)) {
-                Button(
-                    onClick = {navController.navigate("edit_goal/${goal.id}")}, modifier = Modifier.weight(1f)
+            Column {
+
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .fillMaxWidth()
                 ) {
-                    Icon(Icons.Default.Edit, contentDescription = null);
-                    Text("Edit Goal")
-                }
-                if(goal.status == "active") {
-                    Spacer(Modifier.width(8.dp))
-                    Button(onClick = {
-                        mainViewModel.pauseGoal(goal.id)
-                    }, modifier = Modifier.weight(1f)) {
-                        Icon(
-                            Icons.Default.Pause,
-                            contentDescription = null
-                        ); Text("Pause")
-                    }
-                    Spacer(Modifier.width(8.dp))
-                    Button(onClick = {
-                        mainViewModel.completeGoal(goal.id)
-                    }, modifier = Modifier.weight(1f)) {
-                        Icon(
-                            Icons.Default.Check,
-                            contentDescription = null
-                        ); Text("Mark as complete")
+                    AnimatedActionButton(
+                        onClick = { navController.navigate("edit_goal/${goal.id}") },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Default.Edit, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Edit")
                     }
                 }
-                if (goal.status != "active"){
-                    Spacer(Modifier.width(8.dp))
-                    Button(onClick = {
-                        mainViewModel.activateGoal(goal.id)
-                    }, modifier = Modifier.weight(1f)) {
-                        Icon(
-                            Icons.Default.Pause,
-                            contentDescription = null
-                        ); Text("Activate")
+
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .fillMaxWidth()
+                        .animateContentSize(
+                            animationSpec = spring(
+                                stiffness = Spring.StiffnessLow,
+                                dampingRatio = Spring.DampingRatioNoBouncy
+                            )
+                        )
+                ) {
+
+                    AnimatedVisibility(
+                        visible = goal.status == "active",
+                        enter = fadeIn(animationSpec = buttonSpring) +
+                                slideInVertically(initialOffsetY = { it / 3 }),
+                        exit = fadeOut(animationSpec = buttonSpring) +
+                                slideOutVertically(targetOffsetY = { it / 3 })
+                    ) {
+                        Row(modifier = Modifier.fillMaxWidth()) {
+
+                            AnimatedActionButton(
+                                onClick = { mainViewModel.pauseGoal(goal.id) },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.Pause, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Pause")
+                            }
+
+                            Spacer(Modifier.width(8.dp))
+
+                            AnimatedActionButton(
+                                onClick = { mainViewModel.completeGoal(goal.id) },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.Check, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Complete")
+                            }
+                        }
+                    }
+
+                    AnimatedVisibility(
+                        visible = goal.status != "active",
+                        enter = fadeIn(animationSpec = buttonSpring) +
+                                scaleIn(initialScale = 0.9f, animationSpec = buttonSpring),
+                        exit = fadeOut(animationSpec = buttonSpring) +
+                                scaleOut(targetScale = 0.9f, animationSpec = buttonSpring)
+                    ) {
+                        AnimatedActionButton(
+                            onClick = { mainViewModel.activateGoal(goal.id) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.PlayArrow, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Activate")
+                        }
                     }
                 }
             }
+
+
 
             Row(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text("Contributions History", color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))

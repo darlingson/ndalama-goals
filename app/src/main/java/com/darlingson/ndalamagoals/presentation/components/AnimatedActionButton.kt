@@ -25,22 +25,13 @@ fun AnimatedActionButton(
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
 
-    val elevation by animateDpAsState(
-        targetValue = if (pressed) 12.dp else 4.dp,
-        animationSpec = spring(
-            stiffness = Spring.StiffnessMediumLow,
-            dampingRatio = Spring.DampingRatioMediumBouncy
-        ),
-        label = "elevation"
-    )
-
     val scale by animateFloatAsState(
         targetValue = if (pressed) 0.96f else 1f,
         animationSpec = spring(
             stiffness = Spring.StiffnessMediumLow,
             dampingRatio = Spring.DampingRatioMediumBouncy
         ),
-        label = "scale"
+        label = "button_scale"
     )
 
     Button(
@@ -49,10 +40,12 @@ fun AnimatedActionButton(
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
-                shadowElevation = elevation.toPx()
             },
         interactionSource = interactionSource,
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = elevation),
-        content = content
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 0.dp,
+            pressedElevation = 0.dp
+        ),
+        content = { content }
     )
 }

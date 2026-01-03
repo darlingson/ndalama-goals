@@ -1,19 +1,43 @@
 package com.darlingson.ndalamagoals.presentation.screens
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -21,26 +45,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.darlingson.ndalamagoals.data.appViewModel
-import com.darlingson.ndalamagoals.data.entities.Goal
 import com.darlingson.ndalamagoals.data.entities.Contribution
+import com.darlingson.ndalamagoals.data.entities.Goal
 import com.darlingson.ndalamagoals.presentation.components.ContributionItem
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import androidx.compose.runtime.getValue
-import com.darlingson.ndalamagoals.presentation.components.AnimatedActionButton
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.Spring
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewModel, goalId: Int?) {
@@ -48,7 +60,8 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
     val contributions by mainViewModel.allContributions.collectAsState(initial = emptyList())
 
     val goal = goals.firstOrNull { it.id == goalId }
-    val goalContributions = contributions.filter { it.goalId == goalId }.sortedByDescending { it.date }
+    val goalContributions =
+        contributions.filter { it.goalId == goalId }.sortedByDescending { it.date }
 
     if (goal == null) {
         Text("Goal not found", modifier = Modifier.fillMaxSize())
@@ -61,7 +74,7 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
     val savedAmount = progressData.savedAmount
     val expectedAmount = progressData.expectedAmount
     val status = progressData.status
-    val buttonSpring = spring<Float>(
+    spring<Float>(
         stiffness = Spring.StiffnessLow,
         dampingRatio = Spring.DampingRatioMediumBouncy
     )
@@ -74,10 +87,6 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
-                },
-                actions = {
-                    IconButton(onClick = {}) { Icon(Icons.Default.Edit, contentDescription = null) }
-                    IconButton(onClick = {}) { Icon(Icons.Default.MoreVert, contentDescription = null) }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -97,17 +106,51 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
             )
         }
     ) { padding ->
-        Column(modifier = Modifier.padding(padding).fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.padding(16.dp)) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
-                    Icon(Icons.Default.Share, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(60.dp))
-                    Text("Target Date: ${formatDate(goal.targetDate)}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Share,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(60.dp)
+                    )
+                    Text(
+                        "Target Date: ${formatDate(goal.targetDate)}",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     Spacer(Modifier.height(16.dp))
                     Text("CURRENT BALANCE", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("$${String.format("%.0f", savedAmount)} / $${goal.target}", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                    Text("${(progress * 100).toInt()}% Achieved", color = MaterialTheme.colorScheme.primary)
-                    Text("$${String.format("%.0f", goal.target - savedAmount)} left", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    LinearProgressIndicator(progress = progress, color = MaterialTheme.colorScheme.primary, modifier = Modifier.fillMaxWidth())
+                    Text(
+                        "$${String.format("%.0f", savedAmount)} / $${goal.target}",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        "${(progress * 100).toInt()}% Achieved",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        "$${String.format("%.0f", goal.target - savedAmount)} left",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    LinearProgressIndicator(
+                        progress = progress,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                     Text("Status: $status", color = MaterialTheme.colorScheme.primary)
                     Text("purpose of goal: ${goal.goalPurpose}")
                     Text("Goal type: ${goal.goalType}")
@@ -115,7 +158,17 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                     // Show expected vs actual
                     if (expectedAmount > 0) {
                         Text(
-                            "Expected: $${String.format("%.0f", expectedAmount)} | Behind by: $${String.format("%.0f", (expectedAmount - savedAmount).coerceAtLeast(0.0))}",
+                            "Expected: $${
+                                String.format(
+                                    "%.0f",
+                                    expectedAmount
+                                )
+                            } | Behind by: $${
+                                String.format(
+                                    "%.0f",
+                                    (expectedAmount - savedAmount).coerceAtLeast(0.0)
+                                )
+                            }",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp
                         )
@@ -124,13 +177,12 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
             }
 
             Column {
-
                 Row(
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                         .fillMaxWidth()
                 ) {
-                    AnimatedActionButton(
+                    Button(
                         onClick = { navController.navigate("edit_goal/${goal.id}") },
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -144,53 +196,30 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                         .fillMaxWidth()
-                        .animateContentSize(
-                            animationSpec = spring(
-                                stiffness = Spring.StiffnessLow,
-                                dampingRatio = Spring.DampingRatioNoBouncy
-                            )
-                        )
                 ) {
+                    if (goal.status == "active") {
 
-                    AnimatedVisibility(
-                        visible = goal.status == "active",
-                        enter = fadeIn(animationSpec = buttonSpring) +
-                                slideInVertically(initialOffsetY = { it / 3 }),
-                        exit = fadeOut(animationSpec = buttonSpring) +
-                                slideOutVertically(targetOffsetY = { it / 3 })
-                    ) {
-                        Row(modifier = Modifier.fillMaxWidth()) {
-
-                            AnimatedActionButton(
-                                onClick = { mainViewModel.pauseGoal(goal.id) },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Icon(Icons.Default.Pause, contentDescription = null)
-                                Spacer(Modifier.width(8.dp))
-                                Text("Pause")
-                            }
-
+                        Button(
+                            onClick = { mainViewModel.pauseGoal(goal.id) },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(Icons.Default.Pause, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
-
-                            AnimatedActionButton(
-                                onClick = { mainViewModel.completeGoal(goal.id) },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Icon(Icons.Default.Check, contentDescription = null)
-                                Spacer(Modifier.width(8.dp))
-                                Text("Complete")
-                            }
+                            Text("Pause")
                         }
-                    }
 
-                    AnimatedVisibility(
-                        visible = goal.status != "active",
-                        enter = fadeIn(animationSpec = buttonSpring) +
-                                scaleIn(initialScale = 0.9f, animationSpec = buttonSpring),
-                        exit = fadeOut(animationSpec = buttonSpring) +
-                                scaleOut(targetScale = 0.9f, animationSpec = buttonSpring)
-                    ) {
-                        AnimatedActionButton(
+                        Spacer(Modifier.width(8.dp))
+
+                        Button(
+                            onClick = { mainViewModel.completeGoal(goal.id) },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(Icons.Default.Check, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Complete")
+                        }
+                    } else {
+                        Button(
                             onClick = { mainViewModel.activateGoal(goal.id) },
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -200,12 +229,16 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                         }
                     }
                 }
+
             }
 
 
-
             Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-                Text("Contributions History", color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+                Text(
+                    "Contributions History",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
                 Text("View Analytics", color = MaterialTheme.colorScheme.primary)
             }
 
@@ -220,7 +253,11 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                 }
             }
 
-            Text("Goal started on ${formatDate(goal.date)}", color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(16.dp))
+            Text(
+                "Goal started on ${formatDate(goal.date)}",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(16.dp)
+            )
         }
     }
 }
@@ -228,7 +265,7 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
 private fun calculateGoalProgress(goal: Goal, contributions: List<Contribution>): GoalProgressData {
     val currentTime = System.currentTimeMillis()
     val totalDuration = goal.targetDate - goal.date
-    val elapsedDuration = currentTime - goal.date
+    currentTime - goal.date
 
     if (totalDuration <= 0) return GoalProgressData(0f, 0.0, 0.0, "Invalid timeline")
 
@@ -258,7 +295,7 @@ private fun calculateExpectedContributions(goal: Goal, currentTime: Long): Int {
     val elapsedDuration = currentTime - startDate
 
     val frequency = goal.contributionFrequency.lowercase()
-    val totalPeriods = when (frequency) {
+    when (frequency) {
         "daily" -> TimeUnit.MILLISECONDS.toDays(totalDuration)
         "weekly" -> TimeUnit.MILLISECONDS.toDays(totalDuration) / 7
         "bi-weekly" -> TimeUnit.MILLISECONDS.toDays(totalDuration) / 14

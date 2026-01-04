@@ -242,10 +242,12 @@ class MainActivity : FragmentActivity() {
 
     private fun createPromptInfo(): BiometricPrompt.PromptInfo =
         BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Authenticate with biometrics")
-            .setAllowedAuthenticators(BIOMETRIC_STRONG)
+            .setTitle("Authenticate")
+            .setSubtitle("Confirm your identity to continue")
+            .setAllowedAuthenticators(
+                BIOMETRIC_STRONG or DEVICE_CREDENTIAL
+            )
             .setConfirmationRequired(false)
-            .setNegativeButtonText("Login with password")
             .build()
 }
 

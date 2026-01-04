@@ -64,6 +64,10 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.9.6")
     implementation("androidx.compose.material:material-icons-extended")
 
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
+    implementation("androidx.biometric:biometric-ktx:1.2.0-alpha05")
+
+
     val roomVersion = "2.8.4"
 
     implementation("androidx.room:room-runtime:$roomVersion")

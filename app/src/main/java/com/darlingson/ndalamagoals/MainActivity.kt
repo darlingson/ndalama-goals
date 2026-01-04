@@ -26,6 +26,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import android.provider.Settings
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Fingerprint
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -47,6 +65,8 @@ import com.darlingson.ndalamagoals.presentation.screens.ProfileScreen
 import com.darlingson.ndalamagoals.ui.theme.NdalamaGoalsTheme
 
 class MainActivity : FragmentActivity() {
+    private var onAuthSuccess: (() -> Unit)? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val database by lazy { NdalamaDatabase.getDatabase(this) }
         val contributionRepository by lazy { ContributionRepository(database.contributionDao()) }
@@ -94,7 +114,16 @@ class MainActivity : FragmentActivity() {
                     }
                 ) {
                     composable("auth") {
-                        AuthScreen(onAuthenticate = { authenticate() })
+                        AuthRequestScreen(
+                            onAuthenticate = {
+                                onAuthSuccess = {
+                                    navController.navigate("goals_list") {
+                                        popUpTo("auth") { inclusive = true }
+                                    }
+                                }
+                                authenticate()
+                            }
+                        )
                     }
                     composable(
                         "goals_list",
@@ -202,6 +231,8 @@ class MainActivity : FragmentActivity() {
                     "Authenticated with biometrics successfully",
                     Toast.LENGTH_SHORT
                 ).show()
+
+                onAuthSuccess?.invoke()
             }
         }
 
@@ -220,17 +251,103 @@ class MainActivity : FragmentActivity() {
 
 
 @Composable
-fun AuthScreen(onAuthenticate: () -> Unit) {
+fun AuthRequestScreen(
+    onAuthenticate: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        Button(
-            modifier = Modifier.align(Alignment.Center),
-            onClick = onAuthenticate,
+
+        // Top branding
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 96.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Authenticate")
+            Text(
+                text = "Ndalama",
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = "Goals",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
+            )
         }
+
+        // Center auth card
+        Surface(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(horizontal = 24.dp),
+            shape = RoundedCornerShape(28.dp),
+            tonalElevation = 4.dp,
+            shadowElevation = 8.dp
+        ) {
+            Column(
+                modifier = Modifier.padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    modifier = Modifier.size(72.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Fingerprint,
+                        contentDescription = "Biometric authentication",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxSize()
+                    )
+                }
+
+                Text(
+                    text = "Secure your finances",
+                    style = MaterialTheme.typography.titleLarge
+                )
+
+                Text(
+                    text = "Authenticate to continue",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                FilledTonalButton(
+                    onClick = onAuthenticate,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.filledTonalButtonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text(
+                        text = "Authenticate",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
+        }
+
+        // Bottom hint
+        Text(
+            text = "Your biometric data never leaves this device",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 32.dp)
+        )
     }
 }
+

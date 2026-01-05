@@ -1,14 +1,23 @@
 package com.darlingson.ndalamagoals.presentation.screens
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,7 +49,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -52,6 +63,22 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.io.path.Path
+import kotlin.io.path.moveTo
+import kotlin.math.roundToInt
+
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.keyframes
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -242,6 +269,32 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                 Text("View Analytics", color = MaterialTheme.colorScheme.primary)
             }
 
+            if (goalContributions.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    EmptyState()
+
+                    Text(
+                        text = "No contributions yet",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+
+                    Text(
+                        text = "Add your first contribution to get started!",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+            }
+
             LazyColumn(modifier = Modifier.padding(16.dp)) {
                 items(goalContributions) { contribution ->
                     ContributionItem(
@@ -305,7 +358,7 @@ private fun calculateExpectedContributions(goal: Goal, currentTime: Long): Int {
         "quarterly" -> TimeUnit.MILLISECONDS.toDays(totalDuration) / 90
         "6 months" -> TimeUnit.MILLISECONDS.toDays(totalDuration) / 180
         "yearly" -> TimeUnit.MILLISECONDS.toDays(totalDuration) / 365
-        else -> TimeUnit.MILLISECONDS.toDays(totalDuration) / 30 // Default to monthly
+        else -> TimeUnit.MILLISECONDS.toDays(totalDuration) / 30
     }
 
     val elapsedPeriods = when (frequency) {
@@ -318,7 +371,7 @@ private fun calculateExpectedContributions(goal: Goal, currentTime: Long): Int {
         "quarterly" -> TimeUnit.MILLISECONDS.toDays(elapsedDuration) / 90
         "6 months" -> TimeUnit.MILLISECONDS.toDays(elapsedDuration) / 180
         "yearly" -> TimeUnit.MILLISECONDS.toDays(elapsedDuration) / 365
-        else -> TimeUnit.MILLISECONDS.toDays(elapsedDuration) / 30 // Default to monthly
+        else -> TimeUnit.MILLISECONDS.toDays(elapsedDuration) / 30
     }
 
     return elapsedPeriods.toInt().coerceAtLeast(0)
@@ -338,7 +391,7 @@ private fun calculateContributionAmount(goal: Goal): Double {
         "quarterly" -> TimeUnit.MILLISECONDS.toDays(totalDuration) / 90
         "6 months" -> TimeUnit.MILLISECONDS.toDays(totalDuration) / 180
         "yearly" -> TimeUnit.MILLISECONDS.toDays(totalDuration) / 365
-        else -> TimeUnit.MILLISECONDS.toDays(totalDuration) / 30 // Default to monthly
+        else -> TimeUnit.MILLISECONDS.toDays(totalDuration) / 30
     }
 
     return if (totalPeriods > 0) goal.target / totalPeriods else goal.target
@@ -359,3 +412,103 @@ data class GoalProgressData(
     val expectedAmount: Double,
     val status: String
 )
+
+@Composable
+fun EmptyState() {
+    val infiniteTransition = rememberInfiniteTransition(label = "leaf")
+
+    val floatAnimation by infiniteTransition.animateFloat(
+        initialValue = -10f,
+        targetValue = 10f,
+        animationSpec = infiniteRepeatable(
+            tween(2000, easing = LinearEasing),
+            RepeatMode.Reverse
+        ),
+        label = "float"
+    )
+
+    val meanderAnimation by infiniteTransition.animateFloat(
+        initialValue = -40f,
+        targetValue = 40f,
+        animationSpec = infiniteRepeatable(
+            tween(4000, easing = LinearEasing),
+            RepeatMode.Reverse
+        ),
+        label = "meander"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .border(
+                width = 2.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(16.dp)
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        FloatingLeafIcon(
+            offsetX = meanderAnimation,
+            offsetY = floatAnimation
+        )
+    }
+}
+
+@Composable
+fun FloatingLeafIcon(
+    offsetX: Float = 0f,
+    offsetY: Float = 0f,
+    modifier: Modifier = Modifier
+) {
+    Canvas(modifier = modifier.fillMaxWidth().height(180.dp)) {
+        val leafGreen = Color(0xFF6FCF97)
+        val leafMid = Color(0xFF58B784)
+        val stem = Color(0xFF3E7A57)
+
+        val centerX = size.width / 2 + offsetX
+        val centerY = size.height / 2 + offsetY
+
+        val path = Path().apply {
+            moveTo(centerX, centerY - 35f)
+            cubicTo(
+                centerX + 28f, centerY - 25f,
+                centerX + 28f, centerY + 15f,
+                centerX + 2f, centerY + 35f
+            )
+            cubicTo(
+                centerX - 22f, centerY + 15f,
+                centerX - 22f, centerY - 25f,
+                centerX, centerY - 35f
+            )
+            close()
+        }
+
+        drawPath(
+            path = path,
+            brush = Brush.verticalGradient(
+                listOf(leafGreen, leafMid),
+                startY = centerY - 35f,
+                endY = centerY + 35f
+            )
+        )
+
+        drawLine(
+            color = stem.copy(alpha = 0.8f),
+            start = Offset(centerX, centerY - 31f),
+            end = Offset(centerX + 2f, centerY + 25f),
+            strokeWidth = 2f
+        )
+
+        drawLine(
+            color = stem,
+            start = Offset(centerX + 2f, centerY + 35f),
+            end = Offset(centerX + 12f, centerY + 49f),
+            strokeWidth = 4f
+        )
+    }
+}

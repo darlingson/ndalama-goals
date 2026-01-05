@@ -67,25 +67,23 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Edit Goal", color = Color.White) },
+                title = { Text("Edit Goal") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
                     IconButton(onClick = { isPrivate = !isPrivate }) {
                         Icon(
                             if (isPrivate) Icons.Default.Lock else Icons.Default.LockOpen,
-                            contentDescription = "Private",
-                            tint = AccentGreen
+                            contentDescription = "Private"
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = TopBarColor)
             )
         },
-        containerColor = DarkBackground,
+        containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier.padding(innerPadding).fillMaxSize().padding(16.dp),
@@ -95,17 +93,17 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
             item {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                     Box(
-                        modifier = Modifier.size(100.dp).clip(RoundedCornerShape(16.dp)).background(CardBackground),
+                        modifier = Modifier.size(100.dp).clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(selectedIcon, contentDescription = null, tint = Color.White, modifier = Modifier.size(60.dp))
+                        Icon(selectedIcon, contentDescription = null, modifier = Modifier.size(60.dp))
                     }
                     Spacer(Modifier.height(8.dp))
                     TextButton(onClick = { showIconPicker = true }) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Change icon", color = Color.White)
+                            Text("Change icon")
                             Spacer(Modifier.width(8.dp))
-                            Icon(Icons.Default.Edit, contentDescription = null, tint = AccentGreen)
+                            Icon(Icons.Default.Edit, contentDescription = null)
                         }
                     }
                 }
@@ -115,15 +113,8 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
                 OutlinedTextField(
                     value = goalName,
                     onValueChange = { goalName = it },
-                    label = { Text("Goal Name", color = Color.White) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AccentGreen,
-                        unfocusedBorderColor = CardBackground,
-                        focusedLabelColor = AccentGreen,
-                        unfocusedLabelColor = Color.White,
-                        cursorColor = AccentGreen
-                    )
+                    label = { Text("Goal Name") },
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
 
@@ -131,15 +122,8 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Description", color = Color.White) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AccentGreen,
-                        unfocusedBorderColor = CardBackground,
-                        focusedLabelColor = AccentGreen,
-                        unfocusedLabelColor = Color.White,
-                        cursorColor = AccentGreen
-                    )
+                    label = { Text("Description") },
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
 
@@ -147,17 +131,10 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
                 OutlinedTextField(
                     value = targetAmount,
                     onValueChange = { targetAmount = it },
-                    label = { Text("Target Amount", color = Color.White) },
-                    prefix = { Text("$ ", color = Color.White) },
+                    label = { Text("Target Amount") },
+                    prefix = { Text("$ ") },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AccentGreen,
-                        unfocusedBorderColor = CardBackground,
-                        focusedLabelColor = AccentGreen,
-                        unfocusedLabelColor = Color.White,
-                        cursorColor = AccentGreen
-                    )
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
             }
 
@@ -168,21 +145,14 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
                         value = frequency,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Contribution Frequency", color = Color.White) },
+                        label = { Text("Contribution Frequency") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor().fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = AccentGreen,
-                            unfocusedBorderColor = CardBackground,
-                            focusedLabelColor = AccentGreen,
-                            unfocusedLabelColor = Color.White,
-                            cursorColor = AccentGreen
-                        )
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
                     )
                     ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         frequencyOptions.forEach { option ->
                             DropdownMenuItem(
-                                text = { Text(option, color = Color.White) },
+                                text = { Text(option) },
                                 onClick = { frequency = option; expanded = false }
                             )
                         }
@@ -196,14 +166,10 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Priority Goal", color = Color.White, fontWeight = FontWeight.Medium)
+                    Text("Priority Goal", fontWeight = FontWeight.Medium)
                     Switch(
                         checked = isPriority,
-                        onCheckedChange = { isPriority = it },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = AccentGreen,
-                            checkedTrackColor = AccentGreen.copy(alpha = 0.5f)
-                        )
+                        onCheckedChange = { isPriority = it }
                     )
                 }
             }
@@ -213,52 +179,38 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
                     OutlinedTextField(
                         value = dateFormat.format(Date(startDate)),
                         onValueChange = {},
-                        label = { Text("Start Date", color = Color.White) },
+                        label = { Text("Start Date") },
                         readOnly = true,
                         trailingIcon = {
                             IconButton(onClick = { showStartDatePicker = true }) {
-                                Icon(Icons.Default.CalendarToday, null, tint = AccentGreen)
+                                Icon(Icons.Default.CalendarToday, null)
                             }
                         },
-                        modifier = Modifier.weight(1f),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = AccentGreen,
-                            unfocusedBorderColor = CardBackground,
-                            focusedLabelColor = AccentGreen,
-                            unfocusedLabelColor = Color.White,
-                            cursorColor = AccentGreen
-                        )
+                        modifier = Modifier.weight(1f)
                     )
                     OutlinedTextField(
                         value = dateFormat.format(Date(targetDate)),
                         onValueChange = {},
-                        label = { Text("Target Date", color = Color.White) },
+                        label = { Text("Target Date") },
                         readOnly = true,
                         trailingIcon = {
                             IconButton(onClick = { showTargetDatePicker = true }) {
-                                Icon(Icons.Default.CalendarToday, null, tint = AccentGreen)
+                                Icon(Icons.Default.CalendarToday, null)
                             }
                         },
-                        modifier = Modifier.weight(1f),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = AccentGreen,
-                            unfocusedBorderColor = CardBackground,
-                            focusedLabelColor = AccentGreen,
-                            unfocusedLabelColor = Color.White,
-                            cursorColor = AccentGreen
-                        )
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
 
             item {
-                Card(colors = CardDefaults.cardColors(containerColor = AccentGreen.copy(alpha = 0.2f))) {
+                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                     Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Info, contentDescription = null, tint = AccentGreen)
+                        Icon(Icons.Default.Info, contentDescription = null)
                         Spacer(Modifier.width(12.dp))
                         Column {
-                            Text("Goal Progress", color = AccentGreen, fontWeight = FontWeight.Bold)
-                            Text("Update your goal details to stay on track.", color = Color.White)
+                            Text("Goal Progress", fontWeight = FontWeight.Bold)
+                            Text("Update your goal details to stay on track.")
                         }
                     }
                 }
@@ -286,11 +238,7 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
                         }
                     },
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = AccentGreen,
-                        contentColor = Color.Black
-                    )
+                        .fillMaxWidth()
                 ) {
                     Icon(Icons.Default.Save, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
@@ -305,12 +253,12 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
             onDismissRequest = { showStartDatePicker = false },
             confirmButton = {
                 TextButton(onClick = { showStartDatePicker = false }) {
-                    Text("OK", color = AccentGreen)
+                    Text("OK")
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showStartDatePicker = false }) {
-                    Text("Cancel", color = Color.White)
+                    Text("Cancel")
                 }
             }
         ) {
@@ -325,12 +273,12 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
             onDismissRequest = { showTargetDatePicker = false },
             confirmButton = {
                 TextButton(onClick = { showTargetDatePicker = false }) {
-                    Text("OK", color = AccentGreen)
+                    Text("OK")
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showTargetDatePicker = false }) {
-                    Text("Cancel", color = Color.White)
+                    Text("Cancel")
                 }
             }
         ) {
@@ -340,9 +288,3 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
         }
     }
 }
-
-// Colors
-private val DarkBackground = Color(0xFF0A1A17)
-private val CardBackground = Color(0xFF1E3A35)
-private val AccentGreen = Color(0xFF00C4B4)
-private val TopBarColor = Color(0xFF0D1F1C)

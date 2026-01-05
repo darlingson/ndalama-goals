@@ -22,4 +22,7 @@ class GoalRepository(private val goalDao: GoalDao) {
     suspend fun activate(goalId: Int) {
         goalDao.activate(goalId)
     }
+    suspend fun deleteAll() {
+        goalDao.deleteAll()
+    }
 }

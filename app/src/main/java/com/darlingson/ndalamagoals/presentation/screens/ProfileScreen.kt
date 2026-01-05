@@ -55,6 +55,21 @@ import com.darlingson.ndalamagoals.presentation.components.SectionHeader
 import com.darlingson.ndalamagoals.presentation.components.SettingsActionItem
 import com.darlingson.ndalamagoals.presentation.components.SettingsDivider
 import com.darlingson.ndalamagoals.presentation.components.SettingsToggleItem
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import java.io.OutputStream
+import java.io.OutputStreamWriter
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Button
+import com.darlingson.ndalamagoals.data.entities.Goal
+import com.darlingson.ndalamagoals.data.entities.Contribution
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,6 +81,28 @@ fun ProfileScreen(navController: NavHostController, viewModel: appViewModel) {
     val biometrics = settings.biometricsEnabled
     val selectedCurrency = settings.currency
     val selectedFormat = settings.numberFormat
+
+    val showWipeDialog = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    val goals by viewModel.allGoals.collectAsState()
+    val contributions by viewModel.allContributions.collectAsState()
+
+    val createFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/csv"),
+        onResult = { uri ->
+            uri?.let { fileUri ->
+                try {
+                    context.contentResolver.openOutputStream(fileUri)?.use {
+                        CsvExportUtil.exportToCsv(goals,contributions, it)
+                    }
+                    Toast.makeText(context, "Export successful!", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(context, "Export failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    )
 
     Scaffold(
         topBar = {
@@ -166,10 +203,10 @@ fun ProfileScreen(navController: NavHostController, viewModel: appViewModel) {
                 )
                 Spacer(Modifier.width(12.dp))
                 CurrencyItem(
-                    symbol = "£", label = "GBP",
-                    isSelected = selectedCurrency == "GBP",
+                    symbol = "MK", label = "MWK",
+                    isSelected = selectedCurrency == "MWK",
                     modifier = Modifier.weight(1f),
-                    onClick = { viewModel.setCurrency("GBP") }
+                    onClick = { viewModel.setCurrency("MWK") }
                 )
             }
 
@@ -228,15 +265,18 @@ fun ProfileScreen(navController: NavHostController, viewModel: appViewModel) {
                     SettingsDivider()
                     SettingsActionItem(
                         icon = Icons.Default.FileDownload,
-                        title = "Export Data (CSV)"
+                        title = "Export Data",
+                        onClick = {
+                            val filename = "ndalama_goals_export_${System.currentTimeMillis()}.csv"
+                            createFileLauncher.launch(filename)
+                        }
                     )
                 }
             }
 
             Spacer(Modifier.height(24.dp))
-
             OutlinedCard(
-                onClick = { /* TODO: Wipe Data */ },
+                onClick = { showWipeDialog.value = true },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.4f)),
@@ -289,6 +329,54 @@ fun ProfileScreen(navController: NavHostController, viewModel: appViewModel) {
                     textAlign = TextAlign.Center
                 )
             }
+            if (showWipeDialog.value) {
+                AlertDialog(
+                    onDismissRequest = { showWipeDialog.value = false },
+                    title = { Text("Wipe All Data") },
+                    text = { Text("This will permanently delete all your goals and contributions. This action cannot be undone.") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                viewModel.wipeAllData(context)
+                                showWipeDialog.value = false
+                            }
+                        ) {
+                            Text("Wipe", color = MaterialTheme.colorScheme.error)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showWipeDialog.value = false }) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
+
+
+object CsvExportUtil {
+    fun exportToCsv(goals: List<Goal>, contributions: List<Contribution>, outputStream: OutputStream) {
+        OutputStreamWriter(outputStream).use { writer ->
+            writer.write("\uFEFF")
+            writer.write("GOALS DATA\n")
+            writer.write("ID,Name,Description,Target,Date,IsPriority,IsPrivate,Frequency,TargetDate,Status,Type,Purpose\n")
+            goals.forEach { goal ->
+                val name = goal.name.replace("\"", "\"\"")
+                val desc = goal.desc.replace("\"", "\"\"")
+                writer.write("${goal.id},\"$name\",\"${desc}\",${goal.target},${goal.date},${goal.isPriority},${goal.isPrivate},${goal.contributionFrequency},${goal.targetDate},${goal.status},${goal.goalType},${goal.goalPurpose}\n")
+            }
+
+            writer.write("\n")
+            writer.write("CONTRIBUTIONS DATA\n")
+            writer.write("ID,Amount,Type,Description,Date,GoalID,Source\n")
+            contributions.forEach { contribution ->
+                val desc = contribution.desc.replace("\"", "\"\"")
+                writer.write("${contribution.id},${contribution.amount},${contribution.type},\"${desc}\",${contribution.date},${contribution.goalId},${contribution.source}\n")
+            }
+            writer.flush()
         }
     }
 }

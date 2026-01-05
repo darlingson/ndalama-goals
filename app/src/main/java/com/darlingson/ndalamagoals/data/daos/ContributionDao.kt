@@ -14,4 +14,7 @@ interface ContributionDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertContribution(contribution: Contribution)
+
+    @Query("DELETE FROM contributions")
+    suspend fun deleteAll()
 }

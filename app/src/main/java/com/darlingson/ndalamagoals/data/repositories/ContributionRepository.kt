@@ -10,4 +10,7 @@ class ContributionRepository(private val contributionDao: ContributionDao) {
     suspend fun insert(contribution: Contribution) {
         contributionDao.insertContribution(contribution)
     }
+    suspend fun deleteAll() {
+        contributionDao.deleteAll()
+    }
 }

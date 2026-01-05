@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import android.provider.Settings
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -39,6 +40,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -62,6 +67,7 @@ import com.darlingson.ndalamagoals.presentation.screens.GoalsListScreen
 import com.darlingson.ndalamagoals.presentation.screens.MyGoalsScreen
 import com.darlingson.ndalamagoals.presentation.screens.ProfileScreen
 import com.darlingson.ndalamagoals.ui.theme.NdalamaGoalsTheme
+import androidx.compose.runtime.getValue
 
 class MainActivity : FragmentActivity() {
     private var onAuthSuccess: (() -> Unit)? = null
@@ -91,7 +97,11 @@ class MainActivity : FragmentActivity() {
                 val mainViewModel: appViewModel = viewModel(factory = factory)
                 val animDuration = 400
 
-                val startDestination = if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
+                val settings by mainViewModel.settings.collectAsState(initial = null)
+
+                val biometrics = settings?.biometricsEnabled
+
+                val startDestination = if ((canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) && biometrics == true) {
                     "auth"
                 } else {
                     "goals_list"
@@ -99,7 +109,7 @@ class MainActivity : FragmentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = startDestination,
+                    startDestination = "splash",
                     enterTransition = {
                         slideIntoContainer(
                             towards = AnimatedContentTransitionScope.SlideDirection.Left,
@@ -176,6 +186,23 @@ class MainActivity : FragmentActivity() {
                         "my_goals",
                     ) { MyGoalsScreen(navController, mainViewModel) }
                     composable("profile") { ProfileScreen(navController, mainViewModel) }
+                    composable("splash") {
+                        SplashScreen()
+
+                        LaunchedEffect(settings) {
+                            settings?.let {
+                                val destination = if ((canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) && it.biometricsEnabled) {
+                                    "auth"
+                                } else {
+                                    "goals_list"
+                                }
+
+                                navController.navigate(destination) {
+                                    popUpTo("splash") { inclusive = true }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -365,3 +392,22 @@ fun AuthRequestScreen(
     }
 }
 
+
+
+@Composable
+fun SplashScreen() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.img),
+            contentDescription = "Splash screen",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxSize()
+        )
+    }
+}

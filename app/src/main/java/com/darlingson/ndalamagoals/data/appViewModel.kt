@@ -11,14 +11,21 @@ import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darlingson.ndalamagoals.data.entities.GoalType
+import com.darlingson.ndalamagoals.data.repositories.SettingsRepository
 
-class appViewModel(private val contributionRepository: ContributionRepository, private val goalRepository: GoalRepository) : ViewModel() {
+class appViewModel(private val contributionRepository: ContributionRepository, private val goalRepository: GoalRepository, private val repository: SettingsRepository) : ViewModel() {
 
     val allContributions: StateFlow<List<Contribution>> = contributionRepository.allContributions
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     val allGoals: StateFlow<List<Goal>> = goalRepository.allGoals
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
+    val settings: StateFlow<Settings> =
+        repository.settingsFlow
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                Settings()
+            )
 
     fun addContribution(amount: Double, type: String, desc: String, date: Long, goalId: Int, source: String) {
         viewModelScope.launch {
@@ -74,4 +81,19 @@ class appViewModel(private val contributionRepository: ContributionRepository, p
             goalRepository.activate(goalId)
         }
     }
+
+    fun setCurrency(currency: String) =
+        viewModelScope.launch {
+            repository.updateCurrency(currency)
+        }
+
+    fun setFormat(format: Int) =
+        viewModelScope.launch {
+            repository.updateNumberFormat(format)
+        }
+
+    fun setBiometrics(enabled: Boolean) =
+        viewModelScope.launch {
+            repository.updateBiometrics(enabled)
+        }
 }

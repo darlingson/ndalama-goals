@@ -8,7 +8,6 @@ import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.fragment.app.FragmentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -19,7 +18,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +31,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -45,6 +42,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -55,6 +53,7 @@ import com.darlingson.ndalamagoals.data.NdalamaDatabase
 import com.darlingson.ndalamagoals.data.appViewModel
 import com.darlingson.ndalamagoals.data.repositories.ContributionRepository
 import com.darlingson.ndalamagoals.data.repositories.GoalRepository
+import com.darlingson.ndalamagoals.data.repositories.SettingsRepository
 import com.darlingson.ndalamagoals.presentation.screens.AddContributionScreen
 import com.darlingson.ndalamagoals.presentation.screens.CreateGoalScreen
 import com.darlingson.ndalamagoals.presentation.screens.EditGoalScreen
@@ -73,7 +72,11 @@ class MainActivity : FragmentActivity() {
         val goalRepository by lazy { GoalRepository(database.goalDao()) }
         val factory = viewModelFactory {
             initializer {
-                appViewModel(contributionRepository, goalRepository)
+                val context = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]!!
+                    .applicationContext
+
+                val settingsRepository = SettingsRepository(context)
+                appViewModel(contributionRepository, goalRepository, settingsRepository)
             }
         }
 
@@ -163,7 +166,7 @@ class MainActivity : FragmentActivity() {
                     composable(
                         "my_goals",
                     ) { MyGoalsScreen(navController, mainViewModel) }
-                    composable("profile") { ProfileScreen(navController) }
+                    composable("profile") { ProfileScreen(navController, mainViewModel) }
                 }
             }
         }

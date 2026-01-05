@@ -38,9 +38,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.darlingson.ndalamagoals.data.appViewModel
 import com.darlingson.ndalamagoals.presentation.components.CurrencyItem
 import com.darlingson.ndalamagoals.presentation.components.FormatSelectorItem
 import com.darlingson.ndalamagoals.presentation.components.SectionHeader
@@ -58,12 +58,14 @@ import com.darlingson.ndalamagoals.presentation.components.SettingsToggleItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavHostController) {
+fun ProfileScreen(navController: NavHostController, viewModel: appViewModel) {
     val scrollState = rememberScrollState()
 
-    var biometrics by remember { mutableStateOf(true) }
-    var selectedCurrency by remember { mutableStateOf("USD") }
-    var selectedFormat by remember { mutableStateOf(0) }
+    val settings by viewModel.settings.collectAsState()
+
+    val biometrics = settings.biometricsEnabled
+    val selectedCurrency = settings.currency
+    val selectedFormat = settings.numberFormat
 
     Scaffold(
         topBar = {
@@ -153,21 +155,21 @@ fun ProfileScreen(navController: NavHostController) {
                     symbol = "$", label = "USD",
                     isSelected = selectedCurrency == "USD",
                     modifier = Modifier.weight(1f),
-                    onClick = { selectedCurrency = "USD" }
+                    onClick = { viewModel.setCurrency("USD") }
                 )
                 Spacer(Modifier.width(12.dp))
                 CurrencyItem(
                     symbol = "€", label = "EUR",
                     isSelected = selectedCurrency == "EUR",
                     modifier = Modifier.weight(1f),
-                    onClick = { selectedCurrency = "EUR" }
+                    onClick = { viewModel.setCurrency("EUR") }
                 )
                 Spacer(Modifier.width(12.dp))
                 CurrencyItem(
                     symbol = "£", label = "GBP",
                     isSelected = selectedCurrency == "GBP",
                     modifier = Modifier.weight(1f),
-                    onClick = { selectedCurrency = "GBP" }
+                    onClick = { viewModel.setCurrency("GBP") }
                 )
             }
 
@@ -189,13 +191,13 @@ fun ProfileScreen(navController: NavHostController) {
                 )
             ) {
                 Column {
-                    FormatSelectorItem("1,234.56", selectedFormat == 0) { selectedFormat = 0 }
+                    FormatSelectorItem("1,234.56", selectedFormat == 0) { viewModel.setFormat(0) }
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         thickness = 0.5.dp,
                         color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
                     )
-                    FormatSelectorItem("1.234,56", selectedFormat == 1) { selectedFormat = 1 }
+                    FormatSelectorItem("1.234,56", selectedFormat == 1) { viewModel.setFormat(1) }
                 }
             }
 
@@ -219,7 +221,7 @@ fun ProfileScreen(navController: NavHostController) {
                         title = "Biometric Unlock",
                         subtitle = "FaceID / TouchID",
                         checked = biometrics,
-                        onCheckedChange = { biometrics = it }
+                        onCheckedChange = { viewModel.setBiometrics(it) }
                     )
                     SettingsDivider()
                     SettingsActionItem(icon = Icons.Default.Lock, title = "Change Passcode")

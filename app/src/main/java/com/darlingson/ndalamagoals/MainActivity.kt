@@ -80,6 +80,9 @@ class MainActivity : FragmentActivity() {
             }
         }
 
+        val biometricManager = BiometricManager.from(this)
+        val canAuthenticate = biometricManager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -88,9 +91,15 @@ class MainActivity : FragmentActivity() {
                 val mainViewModel: appViewModel = viewModel(factory = factory)
                 val animDuration = 400
 
+                val startDestination = if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
+                    "auth"
+                } else {
+                    "goals_list"
+                }
+
                 NavHost(
                     navController = navController,
-                    startDestination = "auth",
+                    startDestination = startDestination,
                     enterTransition = {
                         slideIntoContainer(
                             towards = AnimatedContentTransitionScope.SlideDirection.Left,

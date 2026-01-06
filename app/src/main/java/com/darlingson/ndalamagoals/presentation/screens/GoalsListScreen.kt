@@ -42,7 +42,6 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
     val goals by mainViewModel.allGoals.collectAsState(initial = emptyList())
     val contributions by mainViewModel.allContributions.collectAsState(initial = emptyList())
 
-    // Calculate totals using sophisticated progress calculation
     val totalSaved = goals.sumOf { goal ->
         val goalContributions = contributions.filter { it.goalId == goal.id }
         calculateGoalProgress(goal, goalContributions).savedAmount
@@ -66,16 +65,11 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
             )
         },
         floatingActionButton = {
-            // 1. State to track if the menu is expanded
             var isFabExpanded by remember { mutableStateOf(false) }
-
-            // 2. Use a Column to stack the sub-buttons ABOVE the main button
             Column(
                 horizontalAlignment = Alignment.End,
-                modifier = Modifier.padding(bottom = 16.dp) // Space from bottom of screen
+                modifier = Modifier.padding(bottom = 16.dp)
             ) {
-
-                // 3. Secondary Buttons (Animated)
                 AnimatedVisibility(
                     visible = isFabExpanded,
                     enter = slideInVertically(initialOffsetY = { it }) + expandVertically(expandFrom = Alignment.Bottom) + fadeIn(),
@@ -83,24 +77,19 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
                 ) {
                     Column(
                         horizontalAlignment = Alignment.End,
-                        verticalArrangement = Arrangement.spacedBy(12.dp) // Space between sub-buttons
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-
-                        // --- Option 1: All Goals ---
-                        // WhatsApp style: Text label on the left, Button on the right
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Label
                             Text(
                                 text = "All Goals",
                                 modifier = Modifier.padding(end = 12.dp),
                                 style = MaterialTheme.typography.labelLarge
                             )
-                            // Small Button
                             SmallFloatingActionButton(
                                 onClick = {
-                                    isFabExpanded = false // Close menu
+                                    isFabExpanded = false
                                     navController.navigate("my_goals")
                                 },
                                 containerColor = MaterialTheme.colorScheme.primary,
@@ -110,7 +99,6 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
                             }
                         }
 
-                        // --- Option 2: Add New Goal ---
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -133,20 +121,26 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
                     }
                 }
 
-                // 4. Main Button
                 FloatingActionButton(
                     onClick = { isFabExpanded = !isFabExpanded },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                 ) {
-                    // Rotate the icon 45 degrees when expanded to look like an "X"
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Menu",
-                        modifier = Modifier.graphicsLayer {
-                            rotationZ = if (isFabExpanded) 45f else 0f
-                        }
-                    )
+                    if (isFabExpanded) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                        )
+                    }
+                    else{
+                        Icon(
+                            imageVector = Icons.Default.Dashboard,
+                            contentDescription = "Menu",
+                            modifier = Modifier.graphicsLayer {
+                                rotationZ = if (isFabExpanded) 45f else 0f
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -308,7 +302,7 @@ private fun calculateContributionAmount(goal: Goal): Double {
         "quarterly" -> totalDays / 90
         "6 months" -> totalDays / 180
         "yearly" -> totalDays / 365
-        else -> totalDays / 30 // Default to monthly
+        else -> totalDays / 30
     }.toInt().coerceAtLeast(1)
 
     return goal.target / totalPeriods
@@ -322,10 +316,3 @@ private fun formatDate(timestamp: Long): String {
         "No due date"
     }
 }
-//
-//private data class GoalProgressData(
-//    val progress: Float,
-//    val savedAmount: Double,
-//    val expectedAmount: Double,
-//    val status: String
-//)

@@ -23,6 +23,8 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.input.KeyboardType
+import com.darlingson.ndalamagoals.data.entities.GoalType
+import java.text.DecimalFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +38,7 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
     var goalName by remember { mutableStateOf(goal?.name ?: "") }
     var targetAmount by remember { mutableStateOf(goal?.target?.toString() ?: "") }
     var frequency by remember { mutableStateOf(goal?.contributionFrequency ?: "Monthly") }
+    var goalType by remember { mutableStateOf(goal?.goalType?.name ?: "SAVINGS") }
     var description by remember { mutableStateOf(goal?.desc ?: "") }
     var startDate by remember { mutableStateOf(goal?.date ?: System.currentTimeMillis()) }
     var targetDate by remember { mutableStateOf(goal?.targetDate ?: System.currentTimeMillis()) }
@@ -49,7 +52,7 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
 
     val frequencyOptions = listOf("Daily", "Weekly", "Bi-weekly", "Monthly", "Bi-monthly", "Tri-monthly", "Quarterly", "6 months", "Yearly")
     val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-
+    val goalTypeOptions = listOf("Savings", "Investment")
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(goal) {
@@ -57,6 +60,7 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
             goalName = it.name
             targetAmount = it.target.toString()
             frequency = it.contributionFrequency
+            goalType = it.goalType.name
             description = it.desc
             startDate = it.date
             targetDate = it.targetDate
@@ -160,6 +164,27 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
                     }
                 }
             }
+            item {
+                var expanded by remember { mutableStateOf(false) }
+                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+                    OutlinedTextField(
+                        value = goalType.toString(),
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Goal Type") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        goalTypeOptions.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option) },
+                                onClick = { goalType = option; expanded = false }
+                            )
+                        }
+                    }
+                }
+            }
 
             item {
                 Row(
@@ -227,6 +252,7 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
                                     name = goalName,
                                     target = targetAmount.toDouble(),
                                     contributionFrequency = frequency,
+                                    goalType = GoalType.valueOf(goalType.uppercase()),
                                     desc = description,
                                     date = startDate,
                                     targetDate = targetDate,

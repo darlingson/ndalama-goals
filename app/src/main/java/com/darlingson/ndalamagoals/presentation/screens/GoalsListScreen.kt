@@ -35,6 +35,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.graphicsLayer
+import com.darlingson.ndalamagoals.data.formatAmount
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +43,7 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
     val goals by mainViewModel.allGoals.collectAsState(initial = emptyList())
     val contributions by mainViewModel.allContributions.collectAsState(initial = emptyList())
     val settings by mainViewModel.settings.collectAsState(initial = null)
-    val numberFormat = settings?.numberFormat ?: "0.00"
+    val pattern = "#,##0.00"
     val currencySymbol = settings?.currency ?: "$"
 
     val totalSaved = goals.sumOf { goal ->
@@ -153,14 +154,14 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.weight(1f)) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
                         Text("TOTAL SAVED", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-                        Text("$currencySymbol${String.format("%,.0f", totalSaved)}", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
+                        Text("$currencySymbol${formatAmount(totalSaved, pattern)}", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
                 Spacer(Modifier.width(16.dp))
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.weight(1f)) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
                         Text("GOAL TARGET", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-                        Text("$currencySymbol${String.format("%,.0f", totalTarget)}", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
+                        Text("$currencySymbol${formatAmount(totalTarget, pattern)}", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             }
@@ -187,7 +188,7 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
                         Spacer(Modifier.width(16.dp))
                         Column {
                             Text(priorityGoal.name, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
-                            Text("$currencySymbol${String.format("%.0f", progressData.savedAmount)} / $${priorityGoal.target}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("$currencySymbol${formatAmount(progressData.savedAmount, pattern)} / $currencySymbol${priorityGoal.target}", color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Text("Status: ${progressData.status}", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
                             Spacer(Modifier.height(8.dp))
                             Button(onClick = {
@@ -213,8 +214,8 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
                     GoalItem(
                         icon = Icons.Default.Analytics,
                         name = goal.name,
-                        amount = "$currencySymbol${String.format("%,.0f", progressData.savedAmount)}",
-                        target = "$currencySymbol${goal.target}",
+                        amount = "$currencySymbol${formatAmount(progressData.savedAmount, pattern)}",
+                        target = "$currencySymbol${formatAmount(goal.target, pattern)}",
                         due = "Due ${formatDate(goal.targetDate)}",
                         progress = progressData.progress,
                         status = progressData.status,

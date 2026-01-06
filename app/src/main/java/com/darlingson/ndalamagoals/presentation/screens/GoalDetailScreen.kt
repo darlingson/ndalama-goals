@@ -66,6 +66,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import com.darlingson.ndalamagoals.data.formatAmount
+import java.text.DecimalFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,6 +95,8 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
         stiffness = Spring.StiffnessLow,
         dampingRatio = Spring.DampingRatioMediumBouncy
     )
+
+    val pattern = "#,##0.00"
 
     Scaffold(
         topBar = {
@@ -148,7 +152,7 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                     Spacer(Modifier.height(16.dp))
                     Text("CURRENT BALANCE", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(
-                        "$currencySymbol${String.format("%,.0f", savedAmount)} / $currencySymbol${goal.target}",
+                        "$currencySymbol${formatAmount(savedAmount, pattern)} / $currencySymbol${formatAmount(goal.target, pattern)}",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -158,7 +162,7 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        "$currencySymbol${String.format("%,.0f", goal.target - savedAmount)} left",
+                        "$currencySymbol${formatAmount(goal.target - savedAmount, pattern)} left",
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     LinearProgressIndicator(
@@ -172,16 +176,9 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
 
                     if (expectedAmount > 0) {
                         Text(
-                            "Expected: $currencySymbol${
-                                String.format(
-                                    "%,.0f",
-                                    expectedAmount
-                                )
+                            "Expected: $currencySymbol${formatAmount(expectedAmount, pattern)
                             } | Behind by: $currencySymbol${
-                                String.format(
-                                    "%,.0f",
-                                    (expectedAmount - savedAmount).coerceAtLeast(0.0)
-                                )
+                                formatAmount((expectedAmount - savedAmount).coerceAtLeast(0.0), pattern)
                             }",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp

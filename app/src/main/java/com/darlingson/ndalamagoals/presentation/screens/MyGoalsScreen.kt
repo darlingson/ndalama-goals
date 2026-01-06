@@ -27,10 +27,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import androidx.compose.runtime.getValue
 
-private val DarkBackground = Color(0xFF0A1A17)
-private val CardBackground = Color(0xFF1E3A35)
 private val AccentGreen = Color(0xFF00C4B4)
-private val TopBarColor = Color(0xFF0D1F1C)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -212,31 +212,31 @@ fun ProfileScreen(navController: NavHostController, viewModel: appViewModel) {
 
             Spacer(Modifier.height(24.dp))
 
-            Text(
-                "Number Formatting",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
-                        alpha = 0.3f
-                    )
-                )
-            ) {
-                Column {
-                    FormatSelectorItem("1,234.56", selectedFormat == 0) { viewModel.setFormat(0) }
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        thickness = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
-                    )
-                    FormatSelectorItem("1.234,56", selectedFormat == 1) { viewModel.setFormat(1) }
-                }
-            }
+//            Text(
+//                "Number Formatting",
+//                style = MaterialTheme.typography.labelMedium,
+//                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+//                modifier = Modifier.padding(bottom = 12.dp)
+//            )
+//
+//            Card(
+//                shape = RoundedCornerShape(16.dp),
+//                colors = CardDefaults.cardColors(
+//                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+//                        alpha = 0.3f
+//                    )
+//                )
+//            ) {
+//                Column {
+//                    FormatSelectorItem("1,234.56", selectedFormat == 0) { viewModel.setFormat(0) }
+//                    HorizontalDivider(
+//                        modifier = Modifier.padding(horizontal = 16.dp),
+//                        thickness = 0.5.dp,
+//                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+//                    )
+//                    FormatSelectorItem("1.234,56", selectedFormat == 1) { viewModel.setFormat(1) }
+//                }
+//            }
 
             Spacer(Modifier.height(32.dp))
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))

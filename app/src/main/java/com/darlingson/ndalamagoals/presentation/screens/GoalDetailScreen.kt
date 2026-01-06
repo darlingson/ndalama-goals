@@ -148,7 +148,7 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                     Spacer(Modifier.height(16.dp))
                     Text("CURRENT BALANCE", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(
-                        "$currencySymbol${String.format("%.0f", savedAmount)} / $currencySymbol${goal.target}",
+                        "$currencySymbol${String.format("%,.0f", savedAmount)} / $currencySymbol${goal.target}",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -158,7 +158,7 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        "$currencySymbol${String.format("%.0f", goal.target - savedAmount)} left",
+                        "$currencySymbol${String.format("%,.0f", goal.target - savedAmount)} left",
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     LinearProgressIndicator(
@@ -174,12 +174,12 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                         Text(
                             "Expected: $currencySymbol${
                                 String.format(
-                                    "%.0f",
+                                    "%,.0f",
                                     expectedAmount
                                 )
                             } | Behind by: $currencySymbol${
                                 String.format(
-                                    "%.0f",
+                                    "%,.0f",
                                     (expectedAmount - savedAmount).coerceAtLeast(0.0)
                                 )
                             }",

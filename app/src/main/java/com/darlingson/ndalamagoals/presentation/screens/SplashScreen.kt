@@ -60,7 +60,7 @@ fun SplashScreen() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "made in Malawi",
+                text = "Made in Malawi",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color.White.copy(alpha = 0.8f),

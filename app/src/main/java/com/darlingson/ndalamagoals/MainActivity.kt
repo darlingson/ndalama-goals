@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import android.provider.Settings
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -42,8 +41,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -314,8 +311,6 @@ fun AuthRequestScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-
-        // Top branding
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -334,7 +329,6 @@ fun AuthRequestScreen(
             )
         }
 
-        // Center auth card
         Surface(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -393,8 +387,6 @@ fun AuthRequestScreen(
                 }
             }
         }
-
-        // Bottom hint
         Text(
             text = "Your biometric data never leaves this device",
             style = MaterialTheme.typography.bodySmall,
@@ -405,23 +397,3 @@ fun AuthRequestScreen(
         )
     }
 }
-
-
-
-//@Composable
-//fun SplashScreen() {
-//    Box(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(MaterialTheme.colorScheme.background)
-//    ) {
-//        Image(
-//            painter = painterResource(id = R.drawable.img),
-//            contentDescription = "Splash screen",
-//            contentScale = ContentScale.Crop,
-//            modifier = Modifier
-//                .align(Alignment.Center)
-//                .fillMaxSize()
-//        )
-//    }
-//}

@@ -153,14 +153,14 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.weight(1f)) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
                         Text("TOTAL SAVED", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-                        Text("$currencySymbol${String.format("%.0f", totalSaved)}", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
+                        Text("$currencySymbol${String.format("%,.0f", totalSaved)}", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
                 Spacer(Modifier.width(16.dp))
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.weight(1f)) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
                         Text("GOAL TARGET", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-                        Text("$currencySymbol${String.format("%.0f", totalTarget)}", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
+                        Text("$currencySymbol${String.format("%,.0f", totalTarget)}", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             }
@@ -213,7 +213,7 @@ fun GoalsListScreen(navController: NavHostController, mainViewModel: appViewMode
                     GoalItem(
                         icon = Icons.Default.Analytics,
                         name = goal.name,
-                        amount = "$currencySymbol${String.format("%.0f", progressData.savedAmount)}",
+                        amount = "$currencySymbol${String.format("%,.0f", progressData.savedAmount)}",
                         target = "$currencySymbol${goal.target}",
                         due = "Due ${formatDate(goal.targetDate)}",
                         progress = progressData.progress,

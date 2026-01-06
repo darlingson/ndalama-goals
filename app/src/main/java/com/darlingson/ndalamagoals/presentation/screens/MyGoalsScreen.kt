@@ -310,7 +310,7 @@ private fun calculateExpectedContributions(goal: Goal, currentTime: Long): Int {
         "quarterly" -> daysElapsed / 90
         "6 months" -> daysElapsed / 180
         "yearly" -> daysElapsed / 365
-        else -> daysElapsed / 30 // Default to monthly
+        else -> daysElapsed / 30
     }.toInt().coerceAtLeast(0)
 }
 

@@ -68,6 +68,11 @@ import com.darlingson.ndalamagoals.presentation.screens.MyGoalsScreen
 import com.darlingson.ndalamagoals.presentation.screens.ProfileScreen
 import com.darlingson.ndalamagoals.ui.theme.NdalamaGoalsTheme
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.darlingson.ndalamagoals.presentation.screens.SplashScreen
+import kotlinx.coroutines.delay
 
 class MainActivity : FragmentActivity() {
     private var onAuthSuccess: (() -> Unit)? = null
@@ -187,18 +192,27 @@ class MainActivity : FragmentActivity() {
                     ) { MyGoalsScreen(navController, mainViewModel) }
                     composable("profile") { ProfileScreen(navController, mainViewModel) }
                     composable("splash") {
+                        var splashComplete by remember { mutableStateOf(false) }
+
                         SplashScreen()
 
-                        LaunchedEffect(settings) {
-                            settings?.let {
-                                val destination = if ((canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) && it.biometricsEnabled) {
-                                    "auth"
-                                } else {
-                                    "goals_list"
-                                }
+                        LaunchedEffect(Unit) {
+                            delay(3000)
+                            splashComplete = true
+                        }
 
-                                navController.navigate(destination) {
-                                    popUpTo("splash") { inclusive = true }
+                        LaunchedEffect(splashComplete, settings) {
+                            if (splashComplete && settings != null) {
+                                settings?.let {
+                                    val destination = if ((canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) && it.biometricsEnabled) {
+                                        "auth"
+                                    } else {
+                                        "goals_list"
+                                    }
+
+                                    navController.navigate(destination) {
+                                        popUpTo("splash") { inclusive = true }
+                                    }
                                 }
                             }
                         }
@@ -394,20 +408,20 @@ fun AuthRequestScreen(
 
 
 
-@Composable
-fun SplashScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.img),
-            contentDescription = "Splash screen",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxSize()
-        )
-    }
-}
+//@Composable
+//fun SplashScreen() {
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(MaterialTheme.colorScheme.background)
+//    ) {
+//        Image(
+//            painter = painterResource(id = R.drawable.img),
+//            contentDescription = "Splash screen",
+//            contentScale = ContentScale.Crop,
+//            modifier = Modifier
+//                .align(Alignment.Center)
+//                .fillMaxSize()
+//        )
+//    }
+//}

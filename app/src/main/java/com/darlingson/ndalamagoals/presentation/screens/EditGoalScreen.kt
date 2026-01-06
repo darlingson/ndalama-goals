@@ -13,12 +13,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.darlingson.ndalamagoals.data.appViewModel
-import com.darlingson.ndalamagoals.data.entities.Goal
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -31,6 +29,9 @@ import androidx.compose.ui.text.input.KeyboardType
 fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel, goalId: Int?) {
     val goals by mainViewModel.allGoals.collectAsState()
     val goal = goals.firstOrNull { it.id == goalId }
+    val settings by mainViewModel.settings.collectAsState(initial = null)
+    val numberFormat = settings?.numberFormat ?: "0.00"
+    val currencySymbol = settings?.currency ?: "$"
 
     var goalName by remember { mutableStateOf(goal?.name ?: "") }
     var targetAmount by remember { mutableStateOf(goal?.target?.toString() ?: "") }
@@ -132,7 +133,7 @@ fun EditGoalScreen(navController: NavHostController, mainViewModel: appViewModel
                     value = targetAmount,
                     onValueChange = { targetAmount = it },
                     label = { Text("Target Amount") },
-                    prefix = { Text("$ ") },
+                    prefix = { Text("$currencySymbol ") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )

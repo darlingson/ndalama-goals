@@ -1,6 +1,5 @@
 package com.darlingson.ndalamagoals.presentation.screens
 
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -49,9 +47,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -63,29 +59,22 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import kotlin.io.path.Path
-import kotlin.io.path.moveTo
-import kotlin.math.roundToInt
-
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.keyframes
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewModel, goalId: Int?) {
     val goals by mainViewModel.allGoals.collectAsState(initial = emptyList())
     val contributions by mainViewModel.allContributions.collectAsState(initial = emptyList())
-
+    val settings by mainViewModel.settings.collectAsState(initial = null)
+    val numberFormat = settings?.numberFormat ?: "0.00"
+    val currencySymbol = settings?.currency ?: "$"
     val goal = goals.firstOrNull { it.id == goalId }
     val goalContributions =
         contributions.filter { it.goalId == goalId }.sortedByDescending { it.date }
@@ -95,7 +84,6 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
         return
     }
 
-    // Calculate advanced progress based on contribution frequency
     val progressData = calculateGoalProgress(goal, goalContributions)
     val progress = progressData.progress
     val savedAmount = progressData.savedAmount
@@ -160,7 +148,7 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                     Spacer(Modifier.height(16.dp))
                     Text("CURRENT BALANCE", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(
-                        "$${String.format("%.0f", savedAmount)} / $${goal.target}",
+                        "$currencySymbol${String.format("%.0f", savedAmount)} / $currencySymbol${goal.target}",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -170,7 +158,7 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        "$${String.format("%.0f", goal.target - savedAmount)} left",
+                        "$currencySymbol${String.format("%.0f", goal.target - savedAmount)} left",
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     LinearProgressIndicator(
@@ -182,15 +170,14 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
                     Text("purpose of goal: ${goal.goalPurpose}")
                     Text("Goal type: ${goal.goalType}")
 
-                    // Show expected vs actual
                     if (expectedAmount > 0) {
                         Text(
-                            "Expected: $${
+                            "Expected: $currencySymbol${
                                 String.format(
                                     "%.0f",
                                     expectedAmount
                                 )
-                            } | Behind by: $${
+                            } | Behind by: $currencySymbol${
                                 String.format(
                                     "%.0f",
                                     (expectedAmount - savedAmount).coerceAtLeast(0.0)
@@ -298,7 +285,7 @@ fun GoalDetailScreen(navController: NavHostController, mainViewModel: appViewMod
             LazyColumn(modifier = Modifier.padding(16.dp)) {
                 items(goalContributions) { contribution ->
                     ContributionItem(
-                        amount = "+$${contribution.amount}",
+                        amount = "+$currencySymbol${contribution.amount}",
                         type = contribution.type,
                         desc = contribution.desc,
                         date = formatDate(contribution.date)
@@ -322,15 +309,12 @@ private fun calculateGoalProgress(goal: Goal, contributions: List<Contribution>)
 
     if (totalDuration <= 0) return GoalProgressData(0f, 0.0, 0.0, "Invalid timeline")
 
-    // Calculate expected contributions based on frequency
     val expectedContributions = calculateExpectedContributions(goal, currentTime)
     val expectedAmount = expectedContributions * calculateContributionAmount(goal)
 
-    // Calculate actual progress
     val savedAmount = contributions.sumOf { it.amount }
     val progress = (savedAmount / goal.target).toFloat().coerceIn(0f, 1f)
 
-    // Determine status
     val status = when {
         progress >= 1f -> "Completed"
         savedAmount >= expectedAmount -> "On Track"

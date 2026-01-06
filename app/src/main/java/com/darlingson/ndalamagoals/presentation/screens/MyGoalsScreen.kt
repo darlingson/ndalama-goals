@@ -37,7 +37,9 @@ private val TopBarColor = Color(0xFF0D1F1C)
 fun MyGoalsScreen(navController: NavHostController, mainViewModel: appViewModel) {
     val goals by mainViewModel.allGoals.collectAsState(initial = emptyList())
     val contributions by mainViewModel.allContributions.collectAsState(initial = emptyList())
-
+    val settings by mainViewModel.settings.collectAsState(initial = null)
+    val numberFormat = settings?.numberFormat ?: "0.00"
+    val currencySymbol = settings?.currency ?: "$"
     var selectedTab by remember { mutableStateOf("Active") }
 
     val totalSaved = goals.sumOf { goal ->
@@ -112,7 +114,7 @@ fun MyGoalsScreen(navController: NavHostController, mainViewModel: appViewModel)
                     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.weight(1f)) {
                         Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                             Text("TOTAL SAVED", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-                            Text("$${String.format("%,.0f", totalSaved)}", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                            Text("$currencySymbol${String.format("%,.0f", totalSaved)}", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, fontSize = 24.sp)
                         }
                     }
                     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), modifier = Modifier.weight(1f)) {
@@ -128,7 +130,6 @@ fun MyGoalsScreen(navController: NavHostController, mainViewModel: appViewModel)
                 Text("${selectedTab.uppercase()} GOALS", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium)
             }
 
-            // Filter goals based on selected tab
             val filteredGoals = goals.filter { goal ->
                 when (selectedTab) {
                     "Active" -> goal.status == "active"
@@ -146,8 +147,8 @@ fun MyGoalsScreen(navController: NavHostController, mainViewModel: appViewModel)
                 GoalListItem(
                     icon = icon,
                     name = goal.name,
-                    target = "$${String.format("%,.0f", goal.target)}",
-                    current = "$${String.format("%,.0f", progressData.savedAmount)}",
+                    target = "$currencySymbol${String.format("%,.0f", goal.target)}",
+                    current = "$currencySymbol${String.format("%,.0f", progressData.savedAmount)}",
                     progress = progressData.progress,
                     due = "Due ${formatDate(goal.targetDate)}",
                     status = progressData.status,
@@ -230,7 +231,6 @@ fun GoalListItem(
     }
 }
 
-// Helper functions
 private fun getGoalIcon(goalName: String): ImageVector {
     return when {
         goalName.contains("Emergency", ignoreCase = true) -> Icons.Default.Warning
@@ -265,7 +265,6 @@ private fun formatDate(timestamp: Long): String {
     }
 }
 
-// Reuse the sophisticated progress calculation from before
 private fun calculateGoalProgress(goal: Goal, contributions: List<Contribution>): GoalProgressData {
     val currentTime = System.currentTimeMillis()
     val totalDuration = goal.targetDate - goal.date
@@ -273,18 +272,14 @@ private fun calculateGoalProgress(goal: Goal, contributions: List<Contribution>)
 
     if (totalDuration <= 0) return GoalProgressData(0f, 0.0, 0.0, "Invalid timeline")
 
-    // Calculate actual saved amount
     val savedAmount = contributions.sumOf { it.amount }
 
-    // Calculate expected contributions based on frequency
     val expectedContributions = calculateExpectedContributions(goal, currentTime)
     val contributionAmount = calculateContributionAmount(goal)
     val expectedAmount = expectedContributions * contributionAmount
 
-    // Calculate progress based on target completion
     val progress = (savedAmount / goal.target).toFloat().coerceIn(0f, 1f)
 
-    // Determine status based on expected vs actual
     val status = when {
         progress >= 1f -> "Completed"
         savedAmount >= expectedAmount -> "On Track"
@@ -337,7 +332,7 @@ private fun calculateContributionAmount(goal: Goal): Double {
         "quarterly" -> totalDays / 90
         "6 months" -> totalDays / 180
         "yearly" -> totalDays / 365
-        else -> totalDays / 30 // Default to monthly
+        else -> totalDays / 30
     }.toInt().coerceAtLeast(1)
 
     return goal.target / totalPeriods

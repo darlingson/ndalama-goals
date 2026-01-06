@@ -40,6 +40,10 @@ fun AddContributionScreen(
     var selectedDate by remember { mutableStateOf(System.currentTimeMillis()) }
     var showDatePicker by remember { mutableStateOf(false) }
 
+    val settings by mainViewModel.settings.collectAsState(initial = null)
+    val numberFormat = settings?.numberFormat ?: "0.00"
+    val currencySymbol = settings?.currency ?: "$"
+
     val contributionSource = listOf("Savings", "Income", "Gift")
     val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
 
@@ -76,11 +80,10 @@ fun AddContributionScreen(
         ) {
             item {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                    Text("$", fontSize = 48.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Light)
+                    Text("$currencySymbol ", fontSize = 48.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Light)
                     BasicTextField(
                         value = amount,
                         onValueChange = { newValue ->
-                            // Allow only digits and decimal point
                             if (newValue.matches(Regex("^\\d*\\.?\\d*$"))) {
                                 amount = newValue
                             }
@@ -94,7 +97,7 @@ fun AddContributionScreen(
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
-                    Text("USD", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 18.sp)
+                    Text("$currencySymbol ", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 18.sp)
                 }
             }
 

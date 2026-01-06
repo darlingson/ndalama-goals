@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,6 +69,10 @@ fun CreateGoalScreen(navController: NavHostController, mainViewModel: appViewMod
     var frequency by remember { mutableStateOf("Monthly") }
     var goalType by remember { mutableStateOf("Savings") }
     var goalPurpose by remember { mutableStateOf("") }
+
+    val settings by mainViewModel.settings.collectAsState(initial = null)
+    val numberFormat = settings?.numberFormat ?: "0.00"
+    val currencySymbol = settings?.currency ?: "$"
 
     var showCreationDatePicker by remember { mutableStateOf(false) }
     var showTargetDatePicker by remember { mutableStateOf(false) }
